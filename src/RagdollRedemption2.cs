@@ -14,8 +14,8 @@ public class RagdollRedemption2 : Script
     }
 
     private const int RagdollDamageThreshold = 15;
-    private const int MinimumRagdollDamageTimeScalar = 5;
-    private const int MaximumRagdollDamageTimeScalar = 25;
+    private const int MinimumRagdollDamageTimeScalar = 25;
+    private const int MaximumRagdollDamageTimeScalar = 100;
 
     private static readonly Random _random = new Random();
 
