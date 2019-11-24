@@ -33,7 +33,7 @@
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="ScriptHookRDRNetAPI, Version=1.0.4.4, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\..\ScriptHookRDRNetAPI.dll</HintPath>
+          <HintPath>..\ScriptHookRDRNetAPI.dll</HintPath>
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
