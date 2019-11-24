@@ -4,7 +4,17 @@ using RDR2.Native;
 
 public class RagdollRedemption2 : Script
 {
+    private enum RagdollType
+    {
+        Normal = 0,
+        FallWithStiffLegs = 1,
+        NarrowLegStumble = 2,
+        WideLegStumble = 3
+    }
+
     private const int RagdollDamageThreshold = 20;
+    private const int MinimumRagdollDamageTimeScalar = 5;
+    private const int MaximumRagdollDamageTimeScalar = 15;
 
     private int _previousPlayerHealth;
 
@@ -18,16 +28,22 @@ public class RagdollRedemption2 : Script
     {
         var playerPed = Game.Player.Character;
         var currentPlayerHealth = GetPedHealth(playerPed);
-        if (_previousPlayerHealth - currentPlayerHealth >= RagdollDamageThreshold)
+        var deltaPlayerHealth = _previousPlayerHealth - currentPlayerHealth;
+        if (deltaPlayerHealth >= RagdollDamageThreshold)
         {
-            RagdollPed(playerPed);
+            RagdollPed(
+                playerPed,
+                deltaPlayerHealth * MinimumRagdollDamageTimeScalar,
+                deltaPlayerHealth * MaximumRagdollDamageTimeScalar,
+                RagdollType.Normal
+            );
         }
         _previousPlayerHealth = currentPlayerHealth;
     }
 
-    private void RagdollPed(Ped ped)
+    private void RagdollPed(Ped ped, int minDuration, int maxDuration, RagdollType ragdollType)
     {
-        Function.Call(Hash.SET_PED_TO_RAGDOLL, ped, 5000, 5000, 0, false, false, false);
+        Function.Call(Hash.SET_PED_TO_RAGDOLL, ped, minDuration, maxDuration, (int)ragdollType, false, false, false);
     }
 
     private void Print(object text)
