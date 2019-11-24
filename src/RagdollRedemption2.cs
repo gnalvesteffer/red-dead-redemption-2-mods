@@ -9,12 +9,15 @@ public class RagdollRedemption2 : Script
         Normal = 0,
         FallWithStiffLegs = 1,
         NarrowLegStumble = 2,
-        WideLegStumble = 3
+        WideLegStumble = 3,
+        LENGTH = 4,
     }
 
-    private const int RagdollDamageThreshold = 20;
+    private const int RagdollDamageThreshold = 15;
     private const int MinimumRagdollDamageTimeScalar = 5;
-    private const int MaximumRagdollDamageTimeScalar = 15;
+    private const int MaximumRagdollDamageTimeScalar = 25;
+
+    private static readonly Random _random = new Random();
 
     private int _previousPlayerHealth;
 
@@ -35,7 +38,7 @@ public class RagdollRedemption2 : Script
                 playerPed,
                 deltaPlayerHealth * MinimumRagdollDamageTimeScalar,
                 deltaPlayerHealth * MaximumRagdollDamageTimeScalar,
-                RagdollType.Normal
+                (RagdollType)_random.Next((int)RagdollType.LENGTH)
             );
         }
         _previousPlayerHealth = currentPlayerHealth;
