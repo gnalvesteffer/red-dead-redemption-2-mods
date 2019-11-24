@@ -1,6 +1,7 @@
 # Common IntelliJ Platform excludes
 
 # User specific
+ScriptHookRDRNetAPI.dll
 src/.idea
 **/.idea/**/workspace.xml
 **/.idea/**/tasks.xml
