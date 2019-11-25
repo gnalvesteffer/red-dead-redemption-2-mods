@@ -7,8 +7,8 @@
         <ProjectGuid>{C61A8667-898A-46B4-B80B-11A1A917E87F}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>RagdollOnHit</RootNamespace>
-        <AssemblyName>RagdollOnHit</AssemblyName>
+        <RootNamespace>RedDeadRedemption2Mods</RootNamespace>
+        <AssemblyName>Mods</AssemblyName>
         <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
@@ -42,7 +42,6 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="RagdollRedemption2.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

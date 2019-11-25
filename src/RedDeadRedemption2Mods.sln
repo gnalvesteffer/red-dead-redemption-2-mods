@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RagdollOnHit", "RagdollOnHit.csproj", "{C61A8667-898A-46B4-B80B-11A1A917E87F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedDeadRedemption2Mods", "RedDeadRedemption2Mods.csproj", "{C61A8667-898A-46B4-B80B-11A1A917E87F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
