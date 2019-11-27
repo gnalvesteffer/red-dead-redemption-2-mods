@@ -4,7 +4,7 @@ using RDR2.Native;
 
 public class RedHotRedemption2 : Script
 {
-    private const float PlayerMovementSpeedToTriggerNormalTimeScale = 1.0f;
+    private const float PlayerMovementSpeedToTriggerNormalTimeScale = 2.0f;
     private const float NormalTimeScaleDurationInSecondsWhenShooting = 0.75f;
     private const float MinimumTimeScale = 0.25f;
 
@@ -19,10 +19,15 @@ public class RedHotRedemption2 : Script
     private void OnTick(object sender, EventArgs e)
     {
         var playerPed = Game.Player.Character;
-        if (IsPedAlive(playerPed) && Game.Player.CanControlCharacter)
+        var isDynamicSlowMotionEnabled =
+            IsPedAlive(playerPed) &&
+            IsPedInCombat(playerPed) &&
+            !IsPedRagdolling(playerPed) &&
+            Game.Player.CanControlCharacter;
+
+        if (isDynamicSlowMotionEnabled)
         {
-            var isPlayerShooting = IsPedShooting(playerPed);
-            if (isPlayerShooting)
+            if (IsPedShooting(playerPed))
             {
                 _shootTimestamp = DateTime.UtcNow;
             }
@@ -34,6 +39,16 @@ public class RedHotRedemption2 : Script
         {
             Game.TimeScale = 1.0f;
         }
+    }
+
+    private static bool IsPedInCombat(Ped ped)
+    {
+        return Function.Call<bool>(Hash.IS_PED_IN_COMBAT, ped);
+    }
+
+    private static bool IsPedRagdolling(Ped ped)
+    {
+        return Function.Call<bool>(Hash.IS_PED_RAGDOLL, ped);
     }
 
     private static float GetPedSpeed(Ped ped)
