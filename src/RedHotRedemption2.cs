@@ -19,7 +19,7 @@ public class RedHotRedemption2 : Script
     private void OnTick(object sender, EventArgs e)
     {
         var playerPed = Game.Player.Character;
-        if (Game.Player.IsAlive)
+        if (IsPedAlive(playerPed) && Game.Player.CanControlCharacter)
         {
             var isPlayerShooting = IsPedShooting(playerPed);
             if (isPlayerShooting)
@@ -32,7 +32,6 @@ public class RedHotRedemption2 : Script
         }
         else
         {
-            Tick -= OnTick;
             Game.TimeScale = 1.0f;
         }
     }
