@@ -11,6 +11,7 @@
         <AssemblyName>Mods</AssemblyName>
         <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -42,6 +43,7 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="MapEditor.cs" />
         <Compile Include="RedHotRedemption2.cs" />
         <Compile Include="RagdollRedemption2.cs" />
         <Compile Include="PointCloudCapture.cs" />
