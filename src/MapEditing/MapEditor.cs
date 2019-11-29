@@ -7,7 +7,6 @@ using RDR2;
 using RDR2.Math;
 using Cursor = System.Windows.Forms.Cursor;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-using Screen = RDR2.UI.Screen;
 
 namespace MapEditing
 {
@@ -270,9 +269,16 @@ namespace MapEditing
 
         private void SpawnTestObject()
         {
-            var spawnPosition = _mapEditorCamera.Position;
-            var spawnRotation = _mapEditorCamera.Rotation;
+            var raycastHitInfo = new Raycast(
+                _mapEditorCamera.Position,
+                _mapEditorCamera.Position + _mapEditorCamera.Rotation.Normalized * 50.0f
+            ).GetHitInfo();
+            var spawnPosition = raycastHitInfo.DidHit ? raycastHitInfo.HitPosition : _mapEditorCamera.Position;
+            var spawnRotation = raycastHitInfo.DidHit ? raycastHitInfo.SurfaceNormal : new Vector3(0, 0, _mapEditorCamera.Rotation.Z);
             SpawnObject("P_TRUNK04X", spawnPosition, spawnRotation);
+            Utilities.DebugPrint($"didHit: {raycastHitInfo.DidHit}");
+            Utilities.DebugPrint($"start: {_mapEditorCamera.Position} | end: {_mapEditorCamera.Position + _mapEditorCamera.Rotation.Normalized * 50.0f}");
+            Utilities.DebugPrint($"spawnPosition: {spawnPosition} | spawnRotation: {spawnRotation}");
         }
 
         private void LoadMap()

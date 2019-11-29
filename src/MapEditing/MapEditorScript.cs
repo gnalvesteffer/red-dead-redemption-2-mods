@@ -5,6 +5,8 @@ namespace MapEditing
 {
     public class MapEditorScript : Script
     {
+        private static string LoadedText = "Loaded Map Editor by Xorberax";
+
         private readonly MapEditor _mapEditor = new MapEditor();
 
         public MapEditorScript()
@@ -12,7 +14,9 @@ namespace MapEditing
             Tick += OnTick;
             KeyDown += _mapEditor.OnKeyDown;
             KeyUp += _mapEditor.OnKeyUp;
-            Utilities.UserFriendlyPrint("Loaded Map Editor by Xorberax");
+            DllImports.AllocConsole();
+            Console.WriteLine(LoadedText);
+            Utilities.UserFriendlyPrint(LoadedText);
         }
 
         private void OnTick(object sender, EventArgs e)

@@ -14,6 +14,7 @@ namespace MapEditing
         {
             var createdString = Function.Call<string>(Hash.CREATE_STRING, 10, "LITERAL_STRING", text.ToString());
             Function.Call(Hash._DRAW_TEXT, createdString, 5, 5);
+            Console.WriteLine(text);
         }
 
         public static void UserFriendlyPrint(object text)
@@ -71,6 +72,70 @@ namespace MapEditing
         public static void ExitScriptedCamera()
         {
             Function.Call(Hash.RENDER_SCRIPT_CAMS, false, false, 0);
+        }
+
+        public enum ShapeTestIntersectionType
+        {
+            IntersectWithMap = 1,
+            IntersectWithVehicles = 2,
+            IntersectWithPeds = 4,
+            IntersectWithObjects = 16,
+            IntersectWithWater = 32,
+            IntersectWithVegetation = 256,
+        }
+
+        /// <returns>Ray Handle</returns>
+        public static int StartShapeTestRay(
+            Vector3 startPosition,
+            Vector3 endPosition,
+            ShapeTestIntersectionType intersectionType = ShapeTestIntersectionType.IntersectWithObjects,
+            Entity entityToIgnore = null
+        )
+        {
+            return Function.Call<int>(
+                Hash._START_SHAPE_TEST_RAY,
+                startPosition.X,
+                startPosition.Y,
+                startPosition.Z,
+                endPosition.X,
+                endPosition.Y,
+                endPosition.Z,
+                (int)intersectionType,
+                entityToIgnore
+            );
+        }
+
+        public static (int resultStatus, bool didHit, Vector3 hitPosition, Vector3 surfaceNormal) GetShapeTestResult(int rayHandle)
+        {
+            var didHitOutputArgument = new OutputArgument();
+            var endPositionOutputArgument = new OutputArgument();
+            var surfaceNormalOutputArgument = new OutputArgument();
+            var entityHitOutputArgument = new OutputArgument();
+            var resultStatus = Function.Call<int>(
+                Hash.GET_SHAPE_TEST_RESULT,
+                rayHandle,
+                didHitOutputArgument,
+                endPositionOutputArgument,
+                surfaceNormalOutputArgument,
+                entityHitOutputArgument
+            );
+
+            var didHit = didHitOutputArgument.GetResult<bool>();
+            if (didHit)
+            {
+                return (
+                    resultStatus,
+                    true,
+                    endPositionOutputArgument.GetResult<Vector3>(),
+                    surfaceNormalOutputArgument.GetResult<Vector3>()
+                );
+            }
+            return (
+                resultStatus,
+                false,
+                new Vector3(),
+                new Vector3()
+            );
         }
     }
 }
