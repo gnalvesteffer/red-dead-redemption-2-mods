@@ -23,6 +23,8 @@ namespace MapEditing
         private TransformationAxis _translationAxis;
         private TransformationAxis _rotationAxis;
         private Camera _camera;
+        private Vector3 _cameraDeltaRelativeTranslationThisTick;
+        private Vector3 _cameraDeltaRelativeRotationThisTick;
 
         public MapEditor()
         {
@@ -34,19 +36,27 @@ namespace MapEditing
                 new Input("Change Transformation Axis", Keys.OemPeriod, false, 30, false, ChangeTransformationAxis),
                 new Input("Negative Transformation", Keys.Left, true, 0, false, () => ApplyTransformation(-1.0f)),
                 new Input("Positive Transformation", Keys.Right, true, 0, false, () => ApplyTransformation(1.0f)),
-                new Input("Move Camera Forward", Keys.W, true, 0, false, () => MoveCamera(Vector3.RelativeFront, new Vector3())),
-                new Input("Move Camera Backward", Keys.S, true, 0, false, () => MoveCamera(Vector3.RelativeBack, new Vector3())),
-                new Input("Move Camera Left", Keys.A, true, 0, false, () => MoveCamera(Vector3.RelativeLeft, new Vector3())),
-                new Input("Move Camera Right", Keys.D, true, 0, false, () => MoveCamera(Vector3.RelativeRight, new Vector3())),
-                new Input("Move Camera Up", Keys.E, true, 0, false, () => MoveCamera(Vector3.RelativeTop, new Vector3())),
-                new Input("Move Camera Down", Keys.Q, true, 0, false, () => MoveCamera(Vector3.RelativeBottom, new Vector3())),
+                new Input("Move Camera Forward", Keys.W, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeFront),
+                new Input("Move Camera Backward", Keys.S, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeBack),
+                new Input("Move Camera Left", Keys.A, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeLeft),
+                new Input("Move Camera Right", Keys.D, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeRight),
+                new Input("Move Camera Up", Keys.E, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeTop),
+                new Input("Move Camera Down", Keys.Q, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeBottom),
             }.ToDictionary(input => input.Key);
         }
 
         public void OnTick()
         {
+            ResetCameraTransformationsForThisTick();
             HandleInputs();
+            MoveCamera(_cameraDeltaRelativeTranslationThisTick, _cameraDeltaRelativeRotationThisTick);
             ++_tick;
+        }
+
+        private void ResetCameraTransformationsForThisTick()
+        {
+            _cameraDeltaRelativeTranslationThisTick = new Vector3();
+            _cameraDeltaRelativeRotationThisTick = new Vector3();
         }
 
         public void OnKeyDown(object sender, KeyEventArgs e)
@@ -62,7 +72,6 @@ namespace MapEditing
 
         private void HandleInputs()
         {
-            Utilities.DebugPrint(string.Join(",", _keysToProcess));
             foreach (var keyToProcess in _keysToProcess)
             {
                 if (!_keyboardInputs.ContainsKey(keyToProcess))
@@ -88,6 +97,10 @@ namespace MapEditing
 
         private void MoveCamera(Vector3 relativeDeltaTranslation, Vector3 relativeDeltaRotation)
         {
+            if (_camera == null)
+            {
+                return;
+            }
             var cameraRotation = _camera.Rotation;
             var cameraForwardRotationRadians = cameraRotation * Utilities.DegreesToRadians;
             var cameraRightRotationRadians = new Vector3(cameraRotation.X, cameraRotation.Y, cameraRotation.Z + 90) * Utilities.DegreesToRadians;
