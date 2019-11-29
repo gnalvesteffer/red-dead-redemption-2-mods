@@ -7,6 +7,7 @@ namespace MapEditing
     {
         public string Name;
         public Keys Key;
+        public bool IsRepeatable;
         public int CooldownDurationInTicks;
         public bool CanBeUsedOutsideOfMapEditor;
         public Action Handler;
@@ -16,6 +17,7 @@ namespace MapEditing
         public Input(
             string name,
             Keys key,
+            bool isRepeatable,
             int cooldownDurationInTicks,
             bool canBeUsedOutsideOfMapEditor,
             Action handler
@@ -23,6 +25,7 @@ namespace MapEditing
         {
             Name = name;
             Key = key;
+            IsRepeatable = isRepeatable;
             CooldownDurationInTicks = cooldownDurationInTicks;
             CanBeUsedOutsideOfMapEditor = canBeUsedOutsideOfMapEditor;
             Handler = handler;

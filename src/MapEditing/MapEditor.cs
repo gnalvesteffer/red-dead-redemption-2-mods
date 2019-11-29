@@ -9,12 +9,14 @@ namespace MapEditing
 {
     public class MapEditor
     {
-        private const float TranslationSpeed = 0.1f;
+        private const float TranslationSpeed = 0.025f;
         private const float RotationSpeed = 1.0f;
         private const float CameraMovementSpeed = 0.1f;
         private static readonly Random Random = new Random();
         private readonly List<SpawnedObject> _spawnedObjects = new List<SpawnedObject>();
-        private readonly Input[] _inputs;
+        private readonly Dictionary<Keys, Input> _keyboardInputs;
+        private readonly HashSet<Keys> _keysToProcess = new HashSet<Keys>();
+        private readonly HashSet<Keys> _handledNonRepeatableKeys = new HashSet<Keys>();
         private bool _isInMapEditorMode;
         private long _tick;
         private TransformationMode _transformationMode;
@@ -24,21 +26,21 @@ namespace MapEditing
 
         public MapEditor()
         {
-            _inputs = new[]
+            _keyboardInputs = new[]
             {
-                new Input("Toggle Map Editor", Keys.F1, 30, true, ToggleMapEditor),
-                new Input("Spawn Test Object", Keys.F2, 30, false, SpawnTestObject),
-                new Input("Change Transformation Mode", Keys.Oemcomma, 30, false, ChangeTransformationMode),
-                new Input("Change Transformation Axis", Keys.OemPeriod, 30, false, ChangeTransformationAxis),
-                new Input("Negative Transformation", Keys.Left, 0, false, () => ApplyTransformation(-1.0f)),
-                new Input("Positive Transformation", Keys.Right, 0, false, () => ApplyTransformation(1.0f)),
-                new Input("Move Camera Forward", Keys.W, 0, false, () => MoveCamera(Vector3.RelativeFront, new Vector3())),
-                new Input("Move Camera Backward", Keys.S, 0, false, () => MoveCamera(Vector3.RelativeBack, new Vector3())),
-                new Input("Move Camera Left", Keys.A, 0, false, () => MoveCamera(Vector3.RelativeLeft, new Vector3())),
-                new Input("Move Camera Right", Keys.D, 0, false, () => MoveCamera(Vector3.RelativeRight, new Vector3())),
-                new Input("Move Camera Up", Keys.E, 0, false, () => MoveCamera(Vector3.RelativeTop, new Vector3())),
-                new Input("Move Camera Down", Keys.Q, 0, false, () => MoveCamera(Vector3.RelativeBottom, new Vector3())),
-            };
+                new Input("Toggle Map Editor", Keys.F1, false, 30, true, ToggleMapEditor),
+                new Input("Spawn Test Object", Keys.F2, false, 30, false, SpawnTestObject),
+                new Input("Change Transformation Mode", Keys.Oemcomma, false, 30, false, ChangeTransformationMode),
+                new Input("Change Transformation Axis", Keys.OemPeriod, false, 30, false, ChangeTransformationAxis),
+                new Input("Negative Transformation", Keys.Left, true, 0, false, () => ApplyTransformation(-1.0f)),
+                new Input("Positive Transformation", Keys.Right, true, 0, false, () => ApplyTransformation(1.0f)),
+                new Input("Move Camera Forward", Keys.W, true, 0, false, () => MoveCamera(Vector3.RelativeFront, new Vector3())),
+                new Input("Move Camera Backward", Keys.S, true, 0, false, () => MoveCamera(Vector3.RelativeBack, new Vector3())),
+                new Input("Move Camera Left", Keys.A, true, 0, false, () => MoveCamera(Vector3.RelativeLeft, new Vector3())),
+                new Input("Move Camera Right", Keys.D, true, 0, false, () => MoveCamera(Vector3.RelativeRight, new Vector3())),
+                new Input("Move Camera Up", Keys.E, true, 0, false, () => MoveCamera(Vector3.RelativeTop, new Vector3())),
+                new Input("Move Camera Down", Keys.Q, true, 0, false, () => MoveCamera(Vector3.RelativeBottom, new Vector3())),
+            }.ToDictionary(input => input.Key);
         }
 
         public void OnTick()
@@ -47,16 +49,37 @@ namespace MapEditing
             ++_tick;
         }
 
+        public void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            _keysToProcess.Add(e.KeyCode);
+        }
+
+        public void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            _keysToProcess.Remove(e.KeyCode);
+            _handledNonRepeatableKeys.Remove(e.KeyCode);
+        }
+
         private void HandleInputs()
         {
-            foreach (var input in _inputs)
+            Utilities.DebugPrint(string.Join(",", _keysToProcess));
+            foreach (var keyToProcess in _keysToProcess)
             {
-                if (
-                    Game.IsKeyPressed(input.Key) &&
-                    (input.CanBeUsedOutsideOfMapEditor || _isInMapEditorMode && !input.CanBeUsedOutsideOfMapEditor) &&
-                    _tick - input.LastUsageTick > input.CooldownDurationInTicks
-                )
+                if (!_keyboardInputs.ContainsKey(keyToProcess))
                 {
+                    continue;
+                }
+                var input = _keyboardInputs[keyToProcess];
+                var shouldHandleInput =
+                    (input.CanBeUsedOutsideOfMapEditor || _isInMapEditorMode && !input.CanBeUsedOutsideOfMapEditor) &&
+                    _tick - input.LastUsageTick > input.CooldownDurationInTicks &&
+                    (input.IsRepeatable || !_handledNonRepeatableKeys.Contains(keyToProcess));
+                if (shouldHandleInput)
+                {
+                    if (!input.IsRepeatable)
+                    {
+                        _handledNonRepeatableKeys.Add(keyToProcess);
+                    }
                     input.LastUsageTick = _tick;
                     input.Handler();
                 }
@@ -115,7 +138,7 @@ namespace MapEditing
         {
             var totalTransformationModeEntries = Enum.GetValues(typeof(TransformationMode)).Length;
             _transformationMode = (TransformationMode)(((int)_transformationMode + 1) % totalTransformationModeEntries);
-            Utilities.UserFriendlyPrint(string.Format("Transformation Mode: {0}", _transformationMode));
+            Utilities.UserFriendlyPrint($"Transformation Mode: {_transformationMode}");
         }
 
         private void ChangeTransformationAxis()
@@ -135,14 +158,14 @@ namespace MapEditing
         {
             var totalAxisEntries = Enum.GetValues(typeof(TransformationAxis)).Length;
             _translationAxis = (TransformationAxis)(((int)_translationAxis + 1) % totalAxisEntries);
-            Utilities.UserFriendlyPrint(string.Format("Translation Axis: {0}", _translationAxis));
+            Utilities.UserFriendlyPrint($"Translation Axis: {_translationAxis}");
         }
 
         private void ChangeRotationAxis()
         {
             var totalRotationAxisEntries = Enum.GetValues(typeof(TransformationAxis)).Length;
             _rotationAxis = (TransformationAxis)(((int)_rotationAxis + 1) % totalRotationAxisEntries);
-            Utilities.UserFriendlyPrint(string.Format("Rotation Axis: {0}", _rotationAxis));
+            Utilities.UserFriendlyPrint($"Rotation Axis: {_rotationAxis}");
         }
 
         private void ToggleMapEditor()
@@ -160,23 +183,33 @@ namespace MapEditing
 
         private void OnMapEditorModeEnter()
         {
-            var playerPed = Game.Player.Character;
-            var cameraPosition = Utilities.GetEntityPosition(playerPed);
-            var cameraRotation = Utilities.GetEntityRotation(playerPed);
-            _camera = World.CreateCamera(cameraPosition, cameraRotation, 75.0f);
-            _camera.IsActive = true;
-            Utilities.EnterScriptedCamera();
+            CreateCamera();
             Game.Player.CanControlCharacter = false;
             Utilities.UserFriendlyPrint("Entered Map Editor");
         }
 
         private void OnMapEditorModeExit()
         {
+            DestroyCamera();
+            Game.Player.CanControlCharacter = true;
+            Utilities.UserFriendlyPrint("Exited Map Editor");
+        }
+
+        private void CreateCamera()
+        {
+            var playerPed = Game.Player.Character;
+            var cameraPosition = Utilities.GetEntityPosition(playerPed);
+            var cameraRotation = Utilities.GetEntityRotation(playerPed);
+            _camera = World.CreateCamera(cameraPosition, cameraRotation, 75.0f);
+            _camera.IsActive = true;
+            Utilities.EnterScriptedCamera();
+        }
+
+        private void DestroyCamera()
+        {
             _camera.IsActive = false;
             _camera.Delete();
             Utilities.ExitScriptedCamera();
-            Game.Player.CanControlCharacter = true;
-            Utilities.UserFriendlyPrint("Exited Map Editor");
         }
 
         private void TranslateLastSpawnedObject(Vector3 deltaTranslation)
@@ -210,11 +243,11 @@ namespace MapEditing
             var spawnedObject = new SpawnedObject(hashValue, position, rotation, entity);
             if (entity == null)
             {
-                Utilities.UserFriendlyPrint(string.Format("Failed to create {0}", hashValue));
+                Utilities.UserFriendlyPrint($"Failed to create {hashValue}");
                 return null;
             }
             _spawnedObjects.Add(spawnedObject);
-            Utilities.UserFriendlyPrint(string.Format("Created {0}", hashValue));
+            Utilities.UserFriendlyPrint($"Created {hashValue}");
             return spawnedObject;
         }
 

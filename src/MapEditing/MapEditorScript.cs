@@ -10,6 +10,8 @@ namespace MapEditing
         public MapEditorScript()
         {
             Tick += OnTick;
+            KeyDown += _mapEditor.OnKeyDown;
+            KeyUp += _mapEditor.OnKeyUp;
         }
 
         private void OnTick(object sender, EventArgs e)
