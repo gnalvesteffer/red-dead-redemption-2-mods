@@ -92,7 +92,7 @@ namespace MapEditing
                     (float)Cursor.Position.Y / screenResolution.Height - 0.5f
                 );
                 var deltaCursorPosition = currentCursorPosition - _lastCursorPosition;
-                _mapEditorCamera.Rotate(new Vector3(deltaCursorPosition.Y, 0, -deltaCursorPosition.X));
+                _mapEditorCamera.Rotate(new Vector3(-deltaCursorPosition.Y, 0, -deltaCursorPosition.X));
                 _lastCursorPosition = currentCursorPosition;
                 _isRotatingMapEditorCamera = true;
             }

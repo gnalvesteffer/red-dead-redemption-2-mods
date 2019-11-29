@@ -82,7 +82,7 @@ namespace MapEditing
             var cameraForwardRotationRadians = cameraRotation * Utilities.DegreesToRadians;
             var cameraRightRotationRadians = new Vector3(cameraRotation.X, cameraRotation.Y, cameraRotation.Z + 90) * Utilities.DegreesToRadians;
             var localSpaceRelativeDeltaRotation = new Vector3(
-                0.0f,
+                _cameraDeltaRelativeRotationThisTick.X,
                 0.0f,
                 _cameraDeltaRelativeRotationThisTick.Z
             );
