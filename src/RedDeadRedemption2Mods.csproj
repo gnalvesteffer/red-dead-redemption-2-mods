@@ -33,7 +33,7 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="ScriptHookRDRNetAPI, Version=1.0.4.4, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="ScriptHookRDRNetAPI, Version=1.0.4.7, Culture=neutral, PublicKeyToken=null">
           <HintPath>..\ScriptHookRDRNetAPI.dll</HintPath>
         </Reference>
         <Reference Include="System" />
@@ -43,7 +43,6 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="MapEditor.cs" />
         <Compile Include="RedHotRedemption2.cs" />
         <Compile Include="RagdollRedemption2.cs" />
         <Compile Include="PointCloudCapture.cs" />

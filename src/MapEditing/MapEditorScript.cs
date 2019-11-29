@@ -12,6 +12,7 @@ namespace MapEditing
             Tick += OnTick;
             KeyDown += _mapEditor.OnKeyDown;
             KeyUp += _mapEditor.OnKeyUp;
+            Utilities.UserFriendlyPrint("Loaded Map Editor by Xorberax");
         }
 
         private void OnTick(object sender, EventArgs e)
