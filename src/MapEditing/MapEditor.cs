@@ -39,6 +39,8 @@ namespace MapEditing
                 new Input("Move Camera Right", Keys.D, true, 0, false, () => _mapEditorCamera.Translate(Vector3.RelativeRight)),
                 new Input("Move Camera Up", Keys.E, true, 0, false, () => _mapEditorCamera.Translate(Vector3.RelativeTop)),
                 new Input("Move Camera Down", Keys.Q, true, 0, false, () => _mapEditorCamera.Translate(Vector3.RelativeBottom)),
+                new Input("Fast Camera Speed", Keys.ShiftKey, true, 0, false, () => _mapEditorCamera.SetSpeedModifierThisTick(10.0f)),
+                new Input("Slow Camera Speed", Keys.ControlKey, true, 0, false, () => _mapEditorCamera.SetSpeedModifierThisTick(0.1f)),
             }.ToDictionary(input => input.Key);
         }
 

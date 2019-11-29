@@ -10,6 +10,7 @@ namespace MapEditing
         private Camera _camera;
         private Vector3 _cameraDeltaRelativeTranslationThisTick;
         private Vector3 _cameraDeltaRelativeRotationThisTick;
+        private float _speedModifierThisTick;
 
         public Vector3 Position => _camera?.Position ?? new Vector3();
         public Vector3 Rotation => _camera?.Rotation ?? new Vector3();
@@ -17,7 +18,7 @@ namespace MapEditing
         public void OnTick()
         {
             ApplyTransformations();
-            ResetDeltaTransformations();
+            ResetInputs();
         }
 
         public void Enter()
@@ -47,6 +48,11 @@ namespace MapEditing
             _cameraDeltaRelativeRotationThisTick += amount;
         }
 
+        public void SetSpeedModifierThisTick(float speedModifier)
+        {
+            _speedModifierThisTick = speedModifier;
+        }
+
         private void ApplyTransformations()
         {
             if (_camera == null)
@@ -61,13 +67,14 @@ namespace MapEditing
                 (float)(_cameraDeltaRelativeTranslationThisTick.X * Math.Sin(cameraForwardRotationRadians.Z)) + (float)(_cameraDeltaRelativeTranslationThisTick.Y * Math.Sin(cameraRightRotationRadians.Z)),
                 _cameraDeltaRelativeTranslationThisTick.Z
             );
-            _camera.Position += localSpaceRelativeDeltaTranslation * CameraMovementSpeed;
+            _camera.Position += localSpaceRelativeDeltaTranslation * CameraMovementSpeed * _speedModifierThisTick;
         }
 
-        private void ResetDeltaTransformations()
+        private void ResetInputs()
         {
             _cameraDeltaRelativeTranslationThisTick = new Vector3();
             _cameraDeltaRelativeRotationThisTick = new Vector3();
+            _speedModifierThisTick = 1.0f;
         }
     }
 }
