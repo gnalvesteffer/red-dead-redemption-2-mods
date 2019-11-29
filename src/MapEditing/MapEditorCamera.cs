@@ -7,6 +7,7 @@ namespace MapEditing
     public class MapEditorCamera
     {
         private const float CameraMovementSpeed = 0.1f;
+        private const float CameraRotationSpeed = 360.0f;
         private Camera _camera;
         private Vector3 _cameraDeltaRelativeTranslationThisTick;
         private Vector3 _cameraDeltaRelativeRotationThisTick;
@@ -17,7 +18,8 @@ namespace MapEditing
 
         public void OnTick()
         {
-            ApplyTransformations();
+            ApplyTranslation();
+            ApplyRotation();
             ResetInputs();
         }
 
@@ -53,7 +55,7 @@ namespace MapEditing
             _speedModifierThisTick = speedModifier;
         }
 
-        private void ApplyTransformations()
+        private void ApplyTranslation()
         {
             if (_camera == null)
             {
@@ -68,6 +70,23 @@ namespace MapEditing
                 _cameraDeltaRelativeTranslationThisTick.Z
             );
             _camera.Position += localSpaceRelativeDeltaTranslation * CameraMovementSpeed * _speedModifierThisTick;
+        }
+
+        private void ApplyRotation()
+        {
+            if (_camera == null)
+            {
+                return;
+            }
+            var cameraRotation = _camera.Rotation;
+            var cameraForwardRotationRadians = cameraRotation * Utilities.DegreesToRadians;
+            var cameraRightRotationRadians = new Vector3(cameraRotation.X, cameraRotation.Y, cameraRotation.Z + 90) * Utilities.DegreesToRadians;
+            var localSpaceRelativeDeltaRotation = new Vector3(
+                0.0f,
+                0.0f,
+                _cameraDeltaRelativeRotationThisTick.Z
+            );
+            _camera.Rotation += localSpaceRelativeDeltaRotation * CameraRotationSpeed;
         }
 
         private void ResetInputs()

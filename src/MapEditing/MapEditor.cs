@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using RDR2;
 using RDR2.Math;
+using Cursor = System.Windows.Forms.Cursor;
+using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
+using Screen = RDR2.UI.Screen;
 
 namespace MapEditing
 {
@@ -11,17 +15,18 @@ namespace MapEditing
     {
         private const float TranslationSpeed = 0.025f;
         private const float RotationSpeed = 1.0f;
-        private static readonly Random Random = new Random();
         private readonly List<SpawnedObject> _spawnedObjects = new List<SpawnedObject>();
         private readonly Dictionary<Keys, Input> _keyboardInputs;
         private readonly HashSet<Keys> _keysToProcess = new HashSet<Keys>();
         private readonly HashSet<Keys> _handledNonRepeatableKeys = new HashSet<Keys>();
+        private Vector2 _lastCursorPosition = new Vector2(0.0f, 0.0f);
         private bool _isInMapEditorMode;
         private long _tick;
         private TransformationMode _transformationMode;
         private TransformationAxis _translationAxis;
         private TransformationAxis _rotationAxis;
         private MapEditorCamera _mapEditorCamera = new MapEditorCamera();
+        private bool _isRotatingMapEditorCamera;
 
         public MapEditor()
         {
@@ -63,6 +68,47 @@ namespace MapEditing
         }
 
         private void HandleInputs()
+        {
+            HandleMapEditorCameraRotation();
+            HandleKeys();
+        }
+
+        private void HandleMapEditorCameraRotation()
+        {
+            if (!_isInMapEditorMode)
+            {
+                return;
+            }
+            var screenResolution = System.Windows.Forms.Screen.PrimaryScreen.Bounds; // TODO: make reliable
+            if (System.Windows.Forms.Control.MouseButtons == MouseButtons.Right)
+            {
+                if (!_isRotatingMapEditorCamera)
+                {
+                    Cursor.Position = new Point(screenResolution.Width / 2, screenResolution.Height / 2);
+                    _lastCursorPosition = new Vector2(0.0f, 0.0f);
+                }
+                var currentCursorPosition = new Vector2(
+                    (float)Cursor.Position.X / screenResolution.Width - 0.5f,
+                    (float)Cursor.Position.Y / screenResolution.Height - 0.5f
+                );
+                var deltaCursorPosition = currentCursorPosition - _lastCursorPosition;
+                _mapEditorCamera.Rotate(new Vector3(deltaCursorPosition.Y, 0, -deltaCursorPosition.X));
+                _lastCursorPosition = currentCursorPosition;
+                _isRotatingMapEditorCamera = true;
+            }
+            else
+            {
+                if (_isRotatingMapEditorCamera)
+                {
+                    Cursor.Position = new Point(screenResolution.Width / 2, screenResolution.Height / 2);
+                    _lastCursorPosition = new Vector2(0.0f, 0.0f);
+                }
+                RDR2.UI.Hud.ShowCursorThisFrame();
+                _isRotatingMapEditorCamera = false;
+            }
+        }
+
+        private void HandleKeys()
         {
             foreach (var keyToProcess in _keysToProcess)
             {
