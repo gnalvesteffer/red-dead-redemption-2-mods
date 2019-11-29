@@ -44,6 +44,7 @@
     <ItemGroup>
         <Compile Include="Input.cs" />
         <Compile Include="MapEditor.cs" />
+        <Compile Include="MapEditorCamera.cs" />
         <Compile Include="MapEditorScript.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="SpawnedObject.cs" />

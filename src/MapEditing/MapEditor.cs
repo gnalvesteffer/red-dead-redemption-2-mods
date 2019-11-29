@@ -11,7 +11,6 @@ namespace MapEditing
     {
         private const float TranslationSpeed = 0.025f;
         private const float RotationSpeed = 1.0f;
-        private const float CameraMovementSpeed = 0.1f;
         private static readonly Random Random = new Random();
         private readonly List<SpawnedObject> _spawnedObjects = new List<SpawnedObject>();
         private readonly Dictionary<Keys, Input> _keyboardInputs;
@@ -22,9 +21,7 @@ namespace MapEditing
         private TransformationMode _transformationMode;
         private TransformationAxis _translationAxis;
         private TransformationAxis _rotationAxis;
-        private Camera _camera;
-        private Vector3 _cameraDeltaRelativeTranslationThisTick;
-        private Vector3 _cameraDeltaRelativeRotationThisTick;
+        private MapEditorCamera _mapEditorCamera = new MapEditorCamera();
 
         public MapEditor()
         {
@@ -36,27 +33,20 @@ namespace MapEditing
                 new Input("Change Transformation Axis", Keys.OemPeriod, false, 30, false, ChangeTransformationAxis),
                 new Input("Negative Transformation", Keys.Left, true, 0, false, () => ApplyTransformation(-1.0f)),
                 new Input("Positive Transformation", Keys.Right, true, 0, false, () => ApplyTransformation(1.0f)),
-                new Input("Move Camera Forward", Keys.W, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeFront),
-                new Input("Move Camera Backward", Keys.S, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeBack),
-                new Input("Move Camera Left", Keys.A, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeLeft),
-                new Input("Move Camera Right", Keys.D, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeRight),
-                new Input("Move Camera Up", Keys.E, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeTop),
-                new Input("Move Camera Down", Keys.Q, true, 0, false, () => _cameraDeltaRelativeTranslationThisTick += Vector3.RelativeBottom),
+                new Input("Move Camera Forward", Keys.W, true, 0, false, () => _mapEditorCamera.Translate(Vector3.RelativeFront)),
+                new Input("Move Camera Backward", Keys.S, true, 0, false, () => _mapEditorCamera.Translate(Vector3.RelativeBack)),
+                new Input("Move Camera Left", Keys.A, true, 0, false, () => _mapEditorCamera.Translate(Vector3.RelativeLeft)),
+                new Input("Move Camera Right", Keys.D, true, 0, false, () => _mapEditorCamera.Translate(Vector3.RelativeRight)),
+                new Input("Move Camera Up", Keys.E, true, 0, false, () => _mapEditorCamera.Translate(Vector3.RelativeTop)),
+                new Input("Move Camera Down", Keys.Q, true, 0, false, () => _mapEditorCamera.Translate(Vector3.RelativeBottom)),
             }.ToDictionary(input => input.Key);
         }
 
         public void OnTick()
         {
-            ResetCameraTransformationsForThisTick();
             HandleInputs();
-            MoveCamera(_cameraDeltaRelativeTranslationThisTick, _cameraDeltaRelativeRotationThisTick);
+            _mapEditorCamera.OnTick();
             ++_tick;
-        }
-
-        private void ResetCameraTransformationsForThisTick()
-        {
-            _cameraDeltaRelativeTranslationThisTick = new Vector3();
-            _cameraDeltaRelativeRotationThisTick = new Vector3();
         }
 
         public void OnKeyDown(object sender, KeyEventArgs e)
@@ -93,23 +83,6 @@ namespace MapEditing
                     input.Handler();
                 }
             }
-        }
-
-        private void MoveCamera(Vector3 relativeDeltaTranslation, Vector3 relativeDeltaRotation)
-        {
-            if (_camera == null)
-            {
-                return;
-            }
-            var cameraRotation = _camera.Rotation;
-            var cameraForwardRotationRadians = cameraRotation * Utilities.DegreesToRadians;
-            var cameraRightRotationRadians = new Vector3(cameraRotation.X, cameraRotation.Y, cameraRotation.Z + 90) * Utilities.DegreesToRadians;
-            var localSpaceRelativeDeltaTranslation = new Vector3(
-                (float)(relativeDeltaTranslation.X * Math.Cos(cameraForwardRotationRadians.Z)) + (float)(relativeDeltaTranslation.Y * Math.Cos(cameraRightRotationRadians.Z)),
-                (float)(relativeDeltaTranslation.X * Math.Sin(cameraForwardRotationRadians.Z)) + (float)(relativeDeltaTranslation.Y * Math.Sin(cameraRightRotationRadians.Z)),
-                relativeDeltaTranslation.Z
-            );
-            _camera.Position += localSpaceRelativeDeltaTranslation * CameraMovementSpeed;
         }
 
         private void ApplyTransformation(float amount)
@@ -196,33 +169,16 @@ namespace MapEditing
 
         private void OnMapEditorModeEnter()
         {
-            CreateCamera();
+            _mapEditorCamera.Enter();
             Game.Player.CanControlCharacter = false;
             Utilities.UserFriendlyPrint("Entered Map Editor");
         }
 
         private void OnMapEditorModeExit()
         {
-            DestroyCamera();
+            _mapEditorCamera.Exit();
             Game.Player.CanControlCharacter = true;
             Utilities.UserFriendlyPrint("Exited Map Editor");
-        }
-
-        private void CreateCamera()
-        {
-            var playerPed = Game.Player.Character;
-            var cameraPosition = Utilities.GetEntityPosition(playerPed);
-            var cameraRotation = Utilities.GetEntityRotation(playerPed);
-            _camera = World.CreateCamera(cameraPosition, cameraRotation, 75.0f);
-            _camera.IsActive = true;
-            Utilities.EnterScriptedCamera();
-        }
-
-        private void DestroyCamera()
-        {
-            _camera.IsActive = false;
-            _camera.Delete();
-            Utilities.ExitScriptedCamera();
         }
 
         private void TranslateLastSpawnedObject(Vector3 deltaTranslation)
@@ -266,9 +222,8 @@ namespace MapEditing
 
         private void SpawnTestObject()
         {
-            var playerPed = Game.Player.Character;
-            var spawnRotation = new Vector3(0.0f, 0.0f, (float)Random.NextDouble() * 360.0f);
-            var spawnPosition = Utilities.GetEntityPosition(playerPed).Around(3.0f);
+            var spawnPosition = _mapEditorCamera.Position;
+            var spawnRotation = _mapEditorCamera.Rotation;
             SpawnObject("P_TRUNK04X", spawnPosition, spawnRotation);
         }
 
