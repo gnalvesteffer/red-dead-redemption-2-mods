@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapEditor", "MapEditing\MapEditor.csproj", "{C037774C-A136-41FE-8277-83494492C009}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmallMods", "SmallMods\SmallMods.csproj", "{C61A8667-898A-46B4-B80B-11A1A917E87F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapEditor", "MapEditor\MapEditor.csproj", "{C037774C-A136-41FE-8277-83494492C009}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,8 +12,5 @@ Global
 		{C037774C-A136-41FE-8277-83494492C009}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C037774C-A136-41FE-8277-83494492C009}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C037774C-A136-41FE-8277-83494492C009}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C61A8667-898A-46B4-B80B-11A1A917E87F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C61A8667-898A-46B4-B80B-11A1A917E87F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C61A8667-898A-46B4-B80B-11A1A917E87F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
