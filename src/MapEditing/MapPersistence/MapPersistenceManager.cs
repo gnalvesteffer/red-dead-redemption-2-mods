@@ -1,26 +1,21 @@
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using Newtonsoft.Json;
 
 namespace MapEditing.MapPersistence
 {
     internal class MapPersistenceManager
     {
-        private static readonly MapObjectSerializer _mapObjectSerializer = new MapObjectSerializer();
-        private static readonly MapObjectDeserializer _mapObjectDeserializer = new MapObjectDeserializer();
-
-        public IEnumerable<SerializableMapObject> LoadMap(string mapFilePath)
+        public SerializableMap LoadMap(string mapFilePath)
         {
-            return File.ReadAllLines(mapFilePath).Select(_mapObjectDeserializer.Deserialize);
+            var serializedMap = File.ReadAllText(mapFilePath);
+            return JsonConvert.DeserializeObject<SerializableMap>(serializedMap);
         }
 
-        public void SaveMap(string mapFilePath, IEnumerable<MapObject> mapObjects)
+        public void SaveMap(string mapFilePath, SerializableMap serializableMap)
         {
-            var serializedMapObjects = mapObjects.Select(mapObject =>
-                _mapObjectSerializer.Serialize(new SerializableMapObject(mapObject))
-            );
+            var serializedMap = JsonConvert.SerializeObject(serializableMap, Formatting.Indented);
             Directory.CreateDirectory(new FileInfo(mapFilePath).DirectoryName);
-            File.WriteAllLines(mapFilePath, serializedMapObjects);
+            File.WriteAllText(mapFilePath, serializedMap);
         }
     }
 }

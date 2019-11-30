@@ -47,9 +47,8 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="MapPersistence\MapObjectDeserializer.cs" />
-        <Compile Include="MapPersistence\MapObjectSerializer.cs" />
         <Compile Include="MapPersistence\MapPersistenceManager.cs" />
+        <Compile Include="MapPersistence\SerializableMap.cs" />
         <Compile Include="MapPersistence\SerializableMapObject.cs" />
         <Compile Include="ThreadedClipboard.cs" />
         <Compile Include="DllImports.cs" />

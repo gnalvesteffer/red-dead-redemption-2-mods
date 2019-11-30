@@ -297,8 +297,8 @@ namespace MapEditing
         private void LoadMap()
         {
             const string mapFilePath = "scripts/MapEditor/maps/test.map";
-            var serializableMapObjects = _mapPersistenceManager.LoadMap(mapFilePath);
-            foreach (var serializableMapObject in serializableMapObjects)
+            var serializableMap = _mapPersistenceManager.LoadMap(mapFilePath);
+            foreach (var serializableMapObject in serializableMap.MapObjects)
             {
                 SpawnObject(
                     serializableMapObject.ModelName,
@@ -312,7 +312,13 @@ namespace MapEditing
         private void SaveMap()
         {
             const string mapFilePath = "scripts/MapEditor/maps/test.map";
-            _mapPersistenceManager.SaveMap(mapFilePath, _spawnedObjects);
+            var serializableMap = new SerializableMap
+            {
+                MapName = $"{Game.Player.Name}'s Map",
+                AuthorName = Game.Player.Name,
+                MapObjects = _spawnedObjects.Select(mapObject => new SerializableMapObject(mapObject)),
+            };
+            _mapPersistenceManager.SaveMap(mapFilePath, serializableMap);
             Utilities.UserFriendlyPrint($"Map saved to {mapFilePath}");
         }
     }
