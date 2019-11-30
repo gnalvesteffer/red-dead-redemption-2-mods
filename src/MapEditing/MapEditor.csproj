@@ -7,14 +7,14 @@
         <ProjectGuid>{C037774C-A136-41FE-8277-83494492C009}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>MapEditing</RootNamespace>
-        <AssemblyName>MapEditing</AssemblyName>
+        <RootNamespace>XorberaxMapEditor</RootNamespace>
+        <AssemblyName>MapEditor</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugSymbols>true</DebugSymbols>
+        <PlatformTarget>x64</PlatformTarget>
+        <DebugSymbols>false</DebugSymbols>
         <DebugType>full</DebugType>
         <Optimize>false</Optimize>
         <OutputPath>bin\Debug\</OutputPath>
@@ -23,7 +23,7 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
+        <PlatformTarget>x64</PlatformTarget>
         <DebugType>pdbonly</DebugType>
         <Optimize>true</Optimize>
         <OutputPath>bin\Release\</OutputPath>
@@ -47,22 +47,22 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="MapEditing\Input.cs" />
+        <Compile Include="MapEditing\MapEditor.cs" />
+        <Compile Include="MapEditing\MapEditorCamera.cs" />
+        <Compile Include="MapEditing\MapObject.cs" />
+        <Compile Include="MapEditing\TransformationAxis.cs" />
+        <Compile Include="MapEditing\TransformationMode.cs" />
         <Compile Include="MapPersistence\MapPersistenceManager.cs" />
         <Compile Include="MapPersistence\SerializableMap.cs" />
         <Compile Include="MapPersistence\SerializableMapObject.cs" />
-        <Compile Include="ThreadedClipboard.cs" />
-        <Compile Include="DllImports.cs" />
-        <Compile Include="Input.cs" />
-        <Compile Include="MapEditor.cs" />
-        <Compile Include="MapEditorCamera.cs" />
-        <Compile Include="MapEditorScript.cs" />
+        <Compile Include="Raycasting\Raycast.cs" />
+        <Compile Include="Raycasting\RaycastHitInfo.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="Raycast.cs" />
-        <Compile Include="RaycastHitInfo.cs" />
-        <Compile Include="MapObject.cs" />
-        <Compile Include="TransformationAxis.cs" />
-        <Compile Include="TransformationMode.cs" />
-        <Compile Include="Utilities.cs" />
+        <Compile Include="Scripts\MapEditorScript.cs" />
+        <Compile Include="Utilities\DllImportsUtility.cs" />
+        <Compile Include="Utilities\NativeUtility.cs" />
+        <Compile Include="Utilities\ThreadedClipboardUtility.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />

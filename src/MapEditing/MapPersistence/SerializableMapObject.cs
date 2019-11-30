@@ -1,7 +1,8 @@
 using Newtonsoft.Json;
 using RDR2.Math;
+using XorberaxMapEditor.MapEditing;
 
-namespace MapEditing.MapPersistence
+namespace XorberaxMapEditor.MapPersistence
 {
     public class SerializableMapObject
     {

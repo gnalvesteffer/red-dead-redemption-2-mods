@@ -1,7 +1,8 @@
 using RDR2;
 using RDR2.Math;
+using XorberaxMapEditor.Utilities;
 
-namespace MapEditing
+namespace XorberaxMapEditor.Raycasting
 {
     internal class Raycast
     {
@@ -18,8 +19,8 @@ namespace MapEditing
 
         public RaycastHitInfo GetHitInfo()
         {
-            var rayHandle = Utilities.StartShapeTestRay(StartPosition, EndPosition, Utilities.ShapeTestIntersectionLevel.IntersectObjects, EntityToIgnore);
-            var shapeTestResult = Utilities.GetShapeTestResult(rayHandle);
+            var rayHandle = NativeUtility.StartShapeTestRay(StartPosition, EndPosition, NativeUtility.ShapeTestIntersectionLevel.IntersectObjects, EntityToIgnore);
+            var shapeTestResult = NativeUtility.GetShapeTestResult(rayHandle);
             return new RaycastHitInfo(
                 shapeTestResult.didHit,
                 shapeTestResult.hitPosition,

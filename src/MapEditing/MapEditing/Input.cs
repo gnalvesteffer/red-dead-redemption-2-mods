@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace MapEditing
+namespace XorberaxMapEditor.MapEditing
 {
     internal class Input
     {

@@ -3,9 +3,9 @@ using RDR2;
 using RDR2.Math;
 using RDR2.Native;
 
-namespace MapEditing
+namespace XorberaxMapEditor.Utilities
 {
-    internal static class Utilities
+    internal static class NativeUtility
     {
         public const float DegreesToRadians = (float)(Math.PI * 2 / 360.0f);
         public const float RadiansToDegrees = (float)(360 / (Math.PI * 2));

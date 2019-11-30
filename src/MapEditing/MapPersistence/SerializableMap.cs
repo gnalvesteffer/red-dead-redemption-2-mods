@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MapEditing.MapPersistence
+namespace XorberaxMapEditor.MapPersistence
 {
     public class SerializableMap
     {

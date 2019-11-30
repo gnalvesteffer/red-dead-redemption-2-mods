@@ -5,9 +5,9 @@ using System.Collections.Specialized;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace MapEditing
+namespace XorberaxMapEditor.Utilities
 {
-    internal class ThreadedClipboard
+    internal class ThreadedClipboardUtility
     {
         private bool _containsFileDropList;
         private bool _containsTextResult;
@@ -31,7 +31,7 @@ namespace MapEditing
 
         public string GetText()
         {
-            var instance = new ThreadedClipboard();
+            var instance = new ThreadedClipboardUtility();
             var staThread = new Thread(instance.ThreadedGetText);
             staThread.SetApartmentState(ApartmentState.STA);
             staThread.Start();
@@ -41,7 +41,7 @@ namespace MapEditing
 
         public string GetText(TextDataFormat format)
         {
-            var instance = new ThreadedClipboard();
+            var instance = new ThreadedClipboardUtility();
             var staThread = new Thread(instance.ThreadedGetText);
             staThread.SetApartmentState(ApartmentState.STA);
             staThread.Start(format);
@@ -66,7 +66,7 @@ namespace MapEditing
 
         public bool ContainsText()
         {
-            var instance = new ThreadedClipboard();
+            var instance = new ThreadedClipboardUtility();
             var staThread = new Thread(instance.ThreadedContainsFileDropList);
             staThread.SetApartmentState(ApartmentState.STA);
             staThread.Start();
@@ -76,7 +76,7 @@ namespace MapEditing
 
         public bool ContainsText(object format)
         {
-            var instance = new ThreadedClipboard();
+            var instance = new ThreadedClipboardUtility();
             var staThread = new Thread(instance.ThreadedContainsFileDropList);
             staThread.SetApartmentState(ApartmentState.STA);
             staThread.Start(format);
@@ -98,7 +98,7 @@ namespace MapEditing
 
         public bool ContainsFileDropList()
         {
-            var instance = new ThreadedClipboard();
+            var instance = new ThreadedClipboardUtility();
             var staThread = new Thread(instance.ThreadedContainsFileDropList);
             staThread.SetApartmentState(ApartmentState.STA);
             staThread.Start();
@@ -120,7 +120,7 @@ namespace MapEditing
 
         public StringCollection GetFileDropList()
         {
-            var instance = new ThreadedClipboard();
+            var instance = new ThreadedClipboardUtility();
             var staThread = new Thread(instance.ThreadedGetFileDropList);
             staThread.SetApartmentState(ApartmentState.STA);
             staThread.Start();

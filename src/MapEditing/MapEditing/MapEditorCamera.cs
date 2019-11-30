@@ -1,8 +1,9 @@
 using System;
 using RDR2;
 using RDR2.Math;
+using XorberaxMapEditor.Utilities;
 
-namespace MapEditing
+namespace XorberaxMapEditor.MapEditing
 {
     internal class MapEditorCamera
     {
@@ -26,18 +27,18 @@ namespace MapEditing
         public void Enter()
         {
             var playerPed = Game.Player.Character;
-            var cameraPosition = Utilities.GetEntityPosition(playerPed);
-            var cameraRotation = Utilities.GetEntityRotation(playerPed);
+            var cameraPosition = NativeUtility.GetEntityPosition(playerPed);
+            var cameraRotation = NativeUtility.GetEntityRotation(playerPed);
             _camera = World.CreateCamera(cameraPosition, cameraRotation, 75.0f);
             _camera.IsActive = true;
-            Utilities.EnterScriptedCamera();
+            NativeUtility.EnterScriptedCamera();
         }
 
         public void Exit()
         {
             _camera.IsActive = false;
             _camera.Delete();
-            Utilities.ExitScriptedCamera();
+            NativeUtility.ExitScriptedCamera();
         }
 
         public void Translate(Vector3 amount)
@@ -62,8 +63,8 @@ namespace MapEditing
                 return;
             }
             var cameraRotation = _camera.Rotation;
-            var cameraForwardRotationRadians = cameraRotation * Utilities.DegreesToRadians;
-            var cameraRightRotationRadians = new Vector3(cameraRotation.X, cameraRotation.Y, cameraRotation.Z + 90) * Utilities.DegreesToRadians;
+            var cameraForwardRotationRadians = cameraRotation * NativeUtility.DegreesToRadians;
+            var cameraRightRotationRadians = new Vector3(cameraRotation.X, cameraRotation.Y, cameraRotation.Z + 90) * NativeUtility.DegreesToRadians;
             var localSpaceRelativeDeltaTranslation = new Vector3(
                 (float)(_cameraDeltaRelativeTranslationThisTick.X * Math.Cos(cameraForwardRotationRadians.Z)) + (float)(_cameraDeltaRelativeTranslationThisTick.Y * Math.Cos(cameraRightRotationRadians.Z)),
                 (float)(_cameraDeltaRelativeTranslationThisTick.X * Math.Sin(cameraForwardRotationRadians.Z)) + (float)(_cameraDeltaRelativeTranslationThisTick.Y * Math.Sin(cameraRightRotationRadians.Z)),

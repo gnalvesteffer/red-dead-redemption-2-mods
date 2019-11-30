@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using MapEditing.MapPersistence;
 using RDR2;
 using RDR2.Math;
+using XorberaxMapEditor.MapPersistence;
+using XorberaxMapEditor.Utilities;
 using Cursor = System.Windows.Forms.Cursor;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 
-namespace MapEditing
+namespace XorberaxMapEditor.MapEditing
 {
     internal class MapEditor
     {
         private const float TranslationSpeed = 0.025f;
         private const float RotationSpeed = 1.0f;
-        private readonly ThreadedClipboard _threadedClipboard = new ThreadedClipboard();
+        private readonly ThreadedClipboardUtility _threadedClipboardUtility = new ThreadedClipboardUtility();
         private readonly MapPersistenceManager _mapPersistenceManager = new MapPersistenceManager();
         private readonly List<MapObject> _spawnedObjects = new List<MapObject>();
         private readonly Dictionary<Keys, Input> _keyboardInputs;
@@ -178,7 +179,7 @@ namespace MapEditing
         {
             var totalTransformationModeEntries = Enum.GetValues(typeof(TransformationMode)).Length;
             _transformationMode = (TransformationMode)(((int)_transformationMode + 1) % totalTransformationModeEntries);
-            Utilities.UserFriendlyPrint($"Transformation Mode: {_transformationMode}");
+            NativeUtility.UserFriendlyPrint($"Transformation Mode: {_transformationMode}");
         }
 
         private void ChangeTransformationAxis()
@@ -198,14 +199,14 @@ namespace MapEditing
         {
             var totalAxisEntries = Enum.GetValues(typeof(TransformationAxis)).Length;
             _translationAxis = (TransformationAxis)(((int)_translationAxis + 1) % totalAxisEntries);
-            Utilities.UserFriendlyPrint($"Translation Axis: {_translationAxis}");
+            NativeUtility.UserFriendlyPrint($"Translation Axis: {_translationAxis}");
         }
 
         private void ChangeRotationAxis()
         {
             var totalRotationAxisEntries = Enum.GetValues(typeof(TransformationAxis)).Length;
             _rotationAxis = (TransformationAxis)(((int)_rotationAxis + 1) % totalRotationAxisEntries);
-            Utilities.UserFriendlyPrint($"Rotation Axis: {_rotationAxis}");
+            NativeUtility.UserFriendlyPrint($"Rotation Axis: {_rotationAxis}");
         }
 
         private void ToggleMapEditor()
@@ -225,14 +226,14 @@ namespace MapEditing
         {
             _mapEditorCamera.Enter();
             Game.Player.CanControlCharacter = false;
-            Utilities.UserFriendlyPrint("Entered Map Editor");
+            NativeUtility.UserFriendlyPrint("Entered Map Editor");
         }
 
         private void OnMapEditorModeExit()
         {
             _mapEditorCamera.Exit();
             Game.Player.CanControlCharacter = true;
-            Utilities.UserFriendlyPrint("Exited Map Editor");
+            NativeUtility.UserFriendlyPrint("Exited Map Editor");
         }
 
         private void TranslateLastSpawnedObject(Vector3 deltaTranslation)
@@ -243,7 +244,7 @@ namespace MapEditing
                 return;
             }
             var newPosition = lastSpawnedObject.Position + deltaTranslation;
-            Utilities.SetEntityPosition(lastSpawnedObject.Entity, newPosition);
+            NativeUtility.SetEntityPosition(lastSpawnedObject.Entity, newPosition);
             lastSpawnedObject.Position = newPosition;
         }
 
@@ -255,28 +256,28 @@ namespace MapEditing
                 return;
             }
             var newRotation = lastSpawnedObject.Rotation + deltaRotation;
-            Utilities.SetEntityRotation(lastSpawnedObject.Entity, newRotation);
+            NativeUtility.SetEntityRotation(lastSpawnedObject.Entity, newRotation);
             lastSpawnedObject.Rotation = newRotation;
         }
 
         private MapObject SpawnObject(string modelName, Vector3 position, Vector3 rotation)
         {
-            var entity = Utilities.CreateObject(modelName, position);
-            Utilities.SetEntityRotation(entity, rotation);
+            var entity = NativeUtility.CreateObject(modelName, position);
+            NativeUtility.SetEntityRotation(entity, rotation);
             var spawnedObject = new MapObject(modelName, position, rotation, entity);
             if (entity == null)
             {
-                Utilities.UserFriendlyPrint($"Failed to spawn \"{modelName}\"");
+                NativeUtility.UserFriendlyPrint($"Failed to spawn \"{modelName}\"");
                 return null;
             }
             _spawnedObjects.Add(spawnedObject);
-            Utilities.UserFriendlyPrint($"Created \"{modelName}\"");
+            NativeUtility.UserFriendlyPrint($"Created \"{modelName}\"");
             return spawnedObject;
         }
 
         private void SpawnSelectedObjectHash()
         {
-            _selectedObjectHash = _threadedClipboard.GetText();
+            _selectedObjectHash = _threadedClipboardUtility.GetText();
             var spawnPosition = _mapEditorCamera.Position;
             var spawnRotation = new Vector3(0, 0, _mapEditorCamera.Rotation.Z);
             SpawnObject(_selectedObjectHash, spawnPosition, spawnRotation);
@@ -291,7 +292,7 @@ namespace MapEditing
             }
             mapObject.Entity.Delete();
             _spawnedObjects.Remove(mapObject);
-            Utilities.UserFriendlyPrint($"Removed \"{mapObject.ModelName}\"");
+            NativeUtility.UserFriendlyPrint($"Removed \"{mapObject.ModelName}\"");
         }
 
         private void LoadMap()
@@ -306,7 +307,7 @@ namespace MapEditing
                     serializableMapObject.Rotation
                 );
             }
-            Utilities.UserFriendlyPrint($"Map loaded: \"{mapFilePath}\"");
+            NativeUtility.UserFriendlyPrint($"Map loaded: \"{mapFilePath}\"");
         }
 
         private void SaveMap()
@@ -319,7 +320,7 @@ namespace MapEditing
                 MapObjects = _spawnedObjects.Select(mapObject => new SerializableMapObject(mapObject)),
             };
             _mapPersistenceManager.SaveMap(mapFilePath, serializableMap);
-            Utilities.UserFriendlyPrint($"Map saved to {mapFilePath}");
+            NativeUtility.UserFriendlyPrint($"Map saved to {mapFilePath}");
         }
     }
 }

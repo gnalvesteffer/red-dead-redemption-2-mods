@@ -1,7 +1,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace MapEditing.MapPersistence
+namespace XorberaxMapEditor.MapPersistence
 {
     internal class MapPersistenceManager
     {

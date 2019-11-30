@@ -1,7 +1,9 @@
 using System;
 using RDR2;
+using XorberaxMapEditor.MapEditing;
+using XorberaxMapEditor.Utilities;
 
-namespace MapEditing
+namespace XorberaxMapEditor.Scripts
 {
     public class MapEditorScript : Script
     {
@@ -14,9 +16,9 @@ namespace MapEditing
             Tick += OnTick;
             KeyDown += _mapEditor.OnKeyDown;
             KeyUp += _mapEditor.OnKeyUp;
-            DllImports.AllocConsole();
+            DllImportsUtility.AllocConsole();
             Console.WriteLine(LoadedText);
-            Utilities.UserFriendlyPrint(LoadedText);
+            NativeUtility.UserFriendlyPrint(LoadedText);
         }
 
         private void OnTick(object sender, EventArgs e)
