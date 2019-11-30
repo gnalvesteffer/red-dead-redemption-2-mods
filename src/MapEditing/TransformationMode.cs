@@ -1,6 +1,6 @@
 namespace MapEditing
 {
-    public enum TransformationMode
+    internal enum TransformationMode
     {
         Translation,
         Rotation,

@@ -3,7 +3,7 @@ using RDR2.Math;
 
 namespace MapEditing
 {
-    public class Raycast
+    internal class Raycast
     {
         public Vector3 StartPosition { get; }
         public Vector3 EndPosition { get; }
@@ -18,7 +18,7 @@ namespace MapEditing
 
         public RaycastHitInfo GetHitInfo()
         {
-            var rayHandle = Utilities.StartShapeTestRay(StartPosition, EndPosition, Utilities.ShapeTestIntersectionType.IntersectWithObjects, EntityToIgnore);
+            var rayHandle = Utilities.StartShapeTestRay(StartPosition, EndPosition, Utilities.ShapeTestIntersectionLevel.IntersectObjects, EntityToIgnore);
             var shapeTestResult = Utilities.GetShapeTestResult(rayHandle);
             return new RaycastHitInfo(
                 shapeTestResult.didHit,

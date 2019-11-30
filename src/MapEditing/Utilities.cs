@@ -5,7 +5,7 @@ using RDR2.Native;
 
 namespace MapEditing
 {
-    public static class Utilities
+    internal static class Utilities
     {
         public const float DegreesToRadians = (float)(Math.PI * 2 / 360.0f);
         public const float RadiansToDegrees = (float)(360 / (Math.PI * 2));
@@ -41,7 +41,7 @@ namespace MapEditing
 
         public static Entity CreateObject(string hashValue, Vector3 position)
         {
-            return Function.Call<Entity>(Hash.CREATE_OBJECT, GetHashKey(hashValue), position.X, position.Y, position.Z, false, false, false);
+            return Function.Call<Entity>(Hash.CREATE_OBJECT_NO_OFFSET, GetHashKey(hashValue), position.X, position.Y, position.Z, false, false, false);
         }
 
         public static Vector3 GetEntityRotation(Entity entity)
@@ -74,21 +74,25 @@ namespace MapEditing
             Function.Call(Hash.RENDER_SCRIPT_CAMS, false, false, 0);
         }
 
-        public enum ShapeTestIntersectionType
+        public enum ShapeTestIntersectionLevel : uint
         {
-            IntersectWithMap = 1,
-            IntersectWithVehicles = 2,
-            IntersectWithPeds = 4,
-            IntersectWithObjects = 16,
-            IntersectWithWater = 32,
-            IntersectWithVegetation = 256,
+            None = 0,
+            IntersectWorld = 1,
+            IntersectVehicles = 2,
+            IntersectPedsSimpleCollision = 4,
+            IntersectPeds = 8,
+            IntersectObjects = 16,
+            IntersectWater = 32,
+            Unknown = 128,
+            IntersectFoliage = 256,
+            IntersectEverything = 4294967295
         }
 
         /// <returns>Ray Handle</returns>
         public static int StartShapeTestRay(
             Vector3 startPosition,
             Vector3 endPosition,
-            ShapeTestIntersectionType intersectionType = ShapeTestIntersectionType.IntersectWithObjects,
+            ShapeTestIntersectionLevel intersectionLevel = ShapeTestIntersectionLevel.IntersectObjects,
             Entity entityToIgnore = null
         )
         {
@@ -100,11 +104,13 @@ namespace MapEditing
                 endPosition.X,
                 endPosition.Y,
                 endPosition.Z,
-                (int)intersectionType,
-                entityToIgnore
+                (int)intersectionLevel,
+                entityToIgnore,
+                1
             );
         }
 
+        /// Bad results
         public static (int resultStatus, bool didHit, Vector3 hitPosition, Vector3 surfaceNormal) GetShapeTestResult(int rayHandle)
         {
             var didHitOutputArgument = new OutputArgument();

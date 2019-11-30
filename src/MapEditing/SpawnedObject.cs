@@ -3,7 +3,7 @@ using RDR2.Math;
 
 namespace MapEditing
 {
-    public class SpawnedObject
+    internal class SpawnedObject
     {
         public Vector3 Position;
         public Vector3 Rotation;

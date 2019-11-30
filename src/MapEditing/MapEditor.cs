@@ -10,10 +10,11 @@ using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 
 namespace MapEditing
 {
-    public class MapEditor
+    internal class MapEditor
     {
         private const float TranslationSpeed = 0.025f;
         private const float RotationSpeed = 1.0f;
+        private readonly ThreadedClipboard _threadedClipboard = new ThreadedClipboard();
         private readonly List<SpawnedObject> _spawnedObjects = new List<SpawnedObject>();
         private readonly Dictionary<Keys, Input> _keyboardInputs;
         private readonly HashSet<Keys> _keysToProcess = new HashSet<Keys>();
@@ -26,13 +27,15 @@ namespace MapEditing
         private TransformationAxis _rotationAxis;
         private MapEditorCamera _mapEditorCamera = new MapEditorCamera();
         private bool _isRotatingMapEditorCamera;
+        private string _selectedObjectHash = "p_amb_tent01x";
 
         public MapEditor()
         {
             _keyboardInputs = new[]
             {
-                new Input("Toggle Map Editor", Keys.F1, false, 30, true, ToggleMapEditor),
-                new Input("Spawn Test Object", Keys.F2, false, 30, false, SpawnTestObject),
+                new Input("Toggle Map Editor", Keys.F1, false, 0, true, ToggleMapEditor),
+                new Input("Spawn Object", Keys.F2, false, 0, false, SpawnSelectedObjectHash),
+                new Input("Select Object", Keys.F3, false, 0, false, PromptObjectSelection),
                 new Input("Change Transformation Mode", Keys.Oemcomma, false, 30, false, ChangeTransformationMode),
                 new Input("Change Transformation Axis", Keys.OemPeriod, false, 30, false, ChangeTransformationAxis),
                 new Input("Negative Transformation", Keys.Left, true, 0, false, () => ApplyTransformation(-1.0f)),
@@ -201,6 +204,12 @@ namespace MapEditing
             Utilities.UserFriendlyPrint($"Rotation Axis: {_rotationAxis}");
         }
 
+        private void PromptObjectSelection()
+        {
+            _selectedObjectHash = _threadedClipboard.GetText(); // ToDo: actually prompt for a hash.
+            Utilities.UserFriendlyPrint($"Spawn object hash: \"{_selectedObjectHash}\"");
+        }
+
         private void ToggleMapEditor()
         {
             _isInMapEditorMode = !_isInMapEditorMode;
@@ -259,7 +268,7 @@ namespace MapEditing
             var spawnedObject = new SpawnedObject(hashValue, position, rotation, entity);
             if (entity == null)
             {
-                Utilities.UserFriendlyPrint($"Failed to create {hashValue}");
+                Utilities.UserFriendlyPrint($"Failed to spawn \"{hashValue}\"");
                 return null;
             }
             _spawnedObjects.Add(spawnedObject);
@@ -267,18 +276,11 @@ namespace MapEditing
             return spawnedObject;
         }
 
-        private void SpawnTestObject()
+        private void SpawnSelectedObjectHash()
         {
-            var raycastHitInfo = new Raycast(
-                _mapEditorCamera.Position,
-                _mapEditorCamera.Position + _mapEditorCamera.Rotation.Normalized * 50.0f
-            ).GetHitInfo();
-            var spawnPosition = raycastHitInfo.DidHit ? raycastHitInfo.HitPosition : _mapEditorCamera.Position;
-            var spawnRotation = raycastHitInfo.DidHit ? raycastHitInfo.SurfaceNormal : new Vector3(0, 0, _mapEditorCamera.Rotation.Z);
-            SpawnObject("P_TRUNK04X", spawnPosition, spawnRotation);
-            Utilities.DebugPrint($"didHit: {raycastHitInfo.DidHit}");
-            Utilities.DebugPrint($"start: {_mapEditorCamera.Position} | end: {_mapEditorCamera.Position + _mapEditorCamera.Rotation.Normalized * 50.0f}");
-            Utilities.DebugPrint($"spawnPosition: {spawnPosition} | spawnRotation: {spawnRotation}");
+            var spawnPosition = _mapEditorCamera.Position;
+            var spawnRotation = new Vector3(0, 0, _mapEditorCamera.Rotation.Z);
+            SpawnObject(_selectedObjectHash, spawnPosition, spawnRotation);
         }
 
         private void LoadMap()

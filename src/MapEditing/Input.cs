@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace MapEditing
 {
-    public class Input
+    internal class Input
     {
         public string Name;
         public Keys Key;

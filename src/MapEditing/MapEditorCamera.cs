@@ -4,7 +4,7 @@ using RDR2.Math;
 
 namespace MapEditing
 {
-    public class MapEditorCamera
+    internal class MapEditorCamera
     {
         private const float CameraMovementSpeed = 0.1f;
         private const float CameraRotationSpeed = 360.0f;

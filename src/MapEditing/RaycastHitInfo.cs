@@ -2,7 +2,7 @@ using RDR2.Math;
 
 namespace MapEditing
 {
-    public class RaycastHitInfo
+    internal class RaycastHitInfo
     {
         public bool DidHit { get; }
         public Vector3 HitPosition { get; }

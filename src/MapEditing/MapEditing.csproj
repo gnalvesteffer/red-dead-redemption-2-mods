@@ -43,6 +43,7 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="ThreadedClipboard.cs" />
         <Compile Include="DllImports.cs" />
         <Compile Include="Input.cs" />
         <Compile Include="MapEditor.cs" />

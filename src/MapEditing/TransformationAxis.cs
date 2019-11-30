@@ -1,6 +1,6 @@
 namespace MapEditing
 {
-    public enum TransformationAxis
+    internal enum TransformationAxis
     {
         X,
         Y,
