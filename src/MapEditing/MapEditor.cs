@@ -15,7 +15,8 @@ namespace MapEditing
         private const float TranslationSpeed = 0.025f;
         private const float RotationSpeed = 1.0f;
         private readonly ThreadedClipboard _threadedClipboard = new ThreadedClipboard();
-        private readonly List<SpawnedObject> _spawnedObjects = new List<SpawnedObject>();
+        private readonly MapPersistenceManager _mapPersistenceManager = new MapPersistenceManager();
+        private readonly List<MapObject> _spawnedObjects = new List<MapObject>();
         private readonly Dictionary<Keys, Input> _keyboardInputs;
         private readonly HashSet<Keys> _keysToProcess = new HashSet<Keys>();
         private readonly HashSet<Keys> _handledNonRepeatableKeys = new HashSet<Keys>();
@@ -35,7 +36,8 @@ namespace MapEditing
             {
                 new Input("Toggle Map Editor", Keys.F1, false, 0, true, ToggleMapEditor),
                 new Input("Spawn Object", Keys.F2, false, 0, false, SpawnSelectedObjectHash),
-                new Input("Select Object", Keys.F3, false, 0, false, PromptObjectSelection),
+                new Input("Load Map", Keys.F3, false, 0, false, LoadMap),
+                new Input("Save Map", Keys.F4, false, 0, false, SaveMap),
                 new Input("Change Transformation Mode", Keys.Oemcomma, false, 30, false, ChangeTransformationMode),
                 new Input("Change Transformation Axis", Keys.OemPeriod, false, 30, false, ChangeTransformationAxis),
                 new Input("Negative Transformation", Keys.Left, true, 0, false, () => ApplyTransformation(-1.0f)),
@@ -204,12 +206,6 @@ namespace MapEditing
             Utilities.UserFriendlyPrint($"Rotation Axis: {_rotationAxis}");
         }
 
-        private void PromptObjectSelection()
-        {
-            _selectedObjectHash = _threadedClipboard.GetText(); // ToDo: actually prompt for a hash.
-            Utilities.UserFriendlyPrint($"Spawn object hash: \"{_selectedObjectHash}\"");
-        }
-
         private void ToggleMapEditor()
         {
             _isInMapEditorMode = !_isInMapEditorMode;
@@ -261,11 +257,11 @@ namespace MapEditing
             lastSpawnedObject.Rotation = newRotation;
         }
 
-        private SpawnedObject SpawnObject(string hashValue, Vector3 position, Vector3 rotation)
+        private MapObject SpawnObject(string hashValue, Vector3 position, Vector3 rotation)
         {
             var entity = Utilities.CreateObject(hashValue, position);
             Utilities.SetEntityRotation(entity, rotation);
-            var spawnedObject = new SpawnedObject(hashValue, position, rotation, entity);
+            var spawnedObject = new MapObject(hashValue, position, rotation, entity);
             if (entity == null)
             {
                 Utilities.UserFriendlyPrint($"Failed to spawn \"{hashValue}\"");
@@ -278,6 +274,7 @@ namespace MapEditing
 
         private void SpawnSelectedObjectHash()
         {
+            _selectedObjectHash = _threadedClipboard.GetText();
             var spawnPosition = _mapEditorCamera.Position;
             var spawnRotation = new Vector3(0, 0, _mapEditorCamera.Rotation.Z);
             SpawnObject(_selectedObjectHash, spawnPosition, spawnRotation);
@@ -285,10 +282,20 @@ namespace MapEditing
 
         private void LoadMap()
         {
+            const string mapFilePath = "scripts/MapEditor/maps/test.map";
+            var mapObjects = _mapPersistenceManager.LoadMap(mapFilePath);
+            foreach (var mapObject in mapObjects)
+            {
+                SpawnObject(mapObject.HashValue, mapObject.Position, mapObject.Rotation);
+            }
+            Utilities.UserFriendlyPrint($"Map loaded: \"{mapFilePath}\"");
         }
 
         private void SaveMap()
         {
+            const string mapFilePath = "scripts/MapEditor/maps/test.map";
+            _mapPersistenceManager.SaveMap(mapFilePath, _spawnedObjects);
+            Utilities.UserFriendlyPrint($"Map saved to {mapFilePath}");
         }
     }
 }
