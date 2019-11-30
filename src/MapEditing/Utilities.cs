@@ -34,9 +34,11 @@ namespace MapEditing
             return Function.Call<int>(Hash.GET_HASH_KEY, hashValue);
         }
 
-        public static Ped CreatePed(string hashValue, Vector3 position)
+        public static Ped CreatePed(string hashValue, Vector3 position, bool isVisible = true)
         {
-            return Function.Call<Ped>(Hash.CREATE_PED, GetHashKey(hashValue), position.X, position.Y, position.Z, 0, false, false, 0);
+            var ped = Function.Call<Ped>(Hash.CREATE_PED, GetHashKey(hashValue), position.X, position.Y, position.Z, 0, false, false, 0);
+            Function.Call((Hash)0x283978A15512B2FE, ped, isVisible);
+            return ped;
         }
 
         public static Entity CreateObject(string hashValue, Vector3 position)
