@@ -36,10 +36,11 @@ namespace MapEditing
             {
                 new Input("Toggle Map Editor", Keys.F1, false, 0, true, ToggleMapEditor),
                 new Input("Spawn Object", Keys.F2, false, 0, false, SpawnSelectedObjectHash),
+                new Input("Delete Object", Keys.Delete, false, 0, false, RemoveLastSpawnedObject),
                 new Input("Load Map", Keys.F3, false, 0, false, LoadMap),
                 new Input("Save Map", Keys.F4, false, 0, false, SaveMap),
-                new Input("Change Transformation Mode", Keys.Oemcomma, false, 30, false, ChangeTransformationMode),
-                new Input("Change Transformation Axis", Keys.OemPeriod, false, 30, false, ChangeTransformationAxis),
+                new Input("Change Transformation Mode", Keys.Oemcomma, false, 0, false, ChangeTransformationMode),
+                new Input("Change Transformation Axis", Keys.OemPeriod, false, 0, false, ChangeTransformationAxis),
                 new Input("Negative Transformation", Keys.Left, true, 0, false, () => ApplyTransformation(-1.0f)),
                 new Input("Positive Transformation", Keys.Right, true, 0, false, () => ApplyTransformation(1.0f)),
                 new Input("Move Camera Forward", Keys.W, true, 0, false, () => _mapEditorCamera.Translate(Vector3.RelativeFront)),
@@ -278,6 +279,18 @@ namespace MapEditing
             var spawnPosition = _mapEditorCamera.Position;
             var spawnRotation = new Vector3(0, 0, _mapEditorCamera.Rotation.Z);
             SpawnObject(_selectedObjectHash, spawnPosition, spawnRotation);
+        }
+
+        private void RemoveLastSpawnedObject()
+        {
+            var mapObject = _spawnedObjects.LastOrDefault();
+            if (mapObject == null)
+            {
+                return;
+            }
+            mapObject.Entity.Delete();
+            _spawnedObjects.Remove(mapObject);
+            Utilities.UserFriendlyPrint($"Removed \"{mapObject.HashValue}\"");
         }
 
         private void LoadMap()
