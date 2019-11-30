@@ -89,6 +89,10 @@ namespace MapEditing.MapEditing
             var screenResolution = Screen.PrimaryScreen.Bounds; // TODO: make reliable
             if (Control.MouseButtons == MouseButtons.Right)
             {
+                if (!_isRotatingMapEditorCamera)
+                {
+                    Cursor.Position = new Point(screenResolution.Width / 2, screenResolution.Height / 2);
+                }
                 var deltaCursorPosition = new Vector2(
                     (float)Cursor.Position.X / screenResolution.Width - 0.5f,
                     (float)Cursor.Position.Y / screenResolution.Height - 0.5f
