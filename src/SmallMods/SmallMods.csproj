@@ -43,6 +43,7 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="PropsDumper.cs" />
         <Compile Include="RedHotRedemption2.cs" />
         <Compile Include="RagdollRedemption2.cs" />
         <Compile Include="PointCloudCapture.cs" />
