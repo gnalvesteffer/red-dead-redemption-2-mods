@@ -7,22 +7,15 @@ namespace MapEditing
     {
         public Vector3 Position;
         public Vector3 Rotation;
-        public string HashValue;
+        public string ModelName;
         public Entity Entity;
 
-        public MapObject(string hashValue, Vector3 position, Vector3 rotation, Entity entity)
+        public MapObject(string modelName, Vector3 position, Vector3 rotation, Entity entity)
         {
-            HashValue = hashValue;
+            ModelName = modelName;
             Position = position;
             Rotation = rotation;
             Entity = entity;
-        }
-
-        public MapObject(string hashValue, Vector3 position, Vector3 rotation)
-        {
-            HashValue = hashValue;
-            Position = position;
-            Rotation = rotation;
         }
     }
 }

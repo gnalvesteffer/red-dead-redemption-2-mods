@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using MapEditing.MapPersistence;
 using RDR2;
 using RDR2.Math;
 using Cursor = System.Windows.Forms.Cursor;
@@ -258,18 +259,18 @@ namespace MapEditing
             lastSpawnedObject.Rotation = newRotation;
         }
 
-        private MapObject SpawnObject(string hashValue, Vector3 position, Vector3 rotation)
+        private MapObject SpawnObject(string modelName, Vector3 position, Vector3 rotation)
         {
-            var entity = Utilities.CreateObject(hashValue, position);
+            var entity = Utilities.CreateObject(modelName, position);
             Utilities.SetEntityRotation(entity, rotation);
-            var spawnedObject = new MapObject(hashValue, position, rotation, entity);
+            var spawnedObject = new MapObject(modelName, position, rotation, entity);
             if (entity == null)
             {
-                Utilities.UserFriendlyPrint($"Failed to spawn \"{hashValue}\"");
+                Utilities.UserFriendlyPrint($"Failed to spawn \"{modelName}\"");
                 return null;
             }
             _spawnedObjects.Add(spawnedObject);
-            Utilities.UserFriendlyPrint($"Created {hashValue}");
+            Utilities.UserFriendlyPrint($"Created \"{modelName}\"");
             return spawnedObject;
         }
 
@@ -290,16 +291,20 @@ namespace MapEditing
             }
             mapObject.Entity.Delete();
             _spawnedObjects.Remove(mapObject);
-            Utilities.UserFriendlyPrint($"Removed \"{mapObject.HashValue}\"");
+            Utilities.UserFriendlyPrint($"Removed \"{mapObject.ModelName}\"");
         }
 
         private void LoadMap()
         {
             const string mapFilePath = "scripts/MapEditor/maps/test.map";
-            var mapObjects = _mapPersistenceManager.LoadMap(mapFilePath);
-            foreach (var mapObject in mapObjects)
+            var serializableMapObjects = _mapPersistenceManager.LoadMap(mapFilePath);
+            foreach (var serializableMapObject in serializableMapObjects)
             {
-                SpawnObject(mapObject.HashValue, mapObject.Position, mapObject.Rotation);
+                SpawnObject(
+                    serializableMapObject.ModelName,
+                    serializableMapObject.Position,
+                    serializableMapObject.Rotation
+                );
             }
             Utilities.UserFriendlyPrint($"Map loaded: \"{mapFilePath}\"");
         }
