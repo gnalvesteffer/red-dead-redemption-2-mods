@@ -7,8 +7,9 @@ using MapEditing.MapPersistence;
 using MapEditing.Utilities;
 using RDR2;
 using RDR2.Math;
-using Cursor = System.Windows.Forms.Cursor;
-using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
+using RDR2.UI;
+using Control = System.Windows.Forms.Control;
+using Screen = System.Windows.Forms.Screen;
 
 namespace MapEditing.MapEditing
 {
@@ -86,8 +87,8 @@ namespace MapEditing.MapEditing
             {
                 return;
             }
-            var screenResolution = System.Windows.Forms.Screen.PrimaryScreen.Bounds; // TODO: make reliable
-            if (System.Windows.Forms.Control.MouseButtons == MouseButtons.Right)
+            var screenResolution = Screen.PrimaryScreen.Bounds; // TODO: make reliable
+            if (Control.MouseButtons == MouseButtons.Right)
             {
                 if (!_isRotatingMapEditorCamera)
                 {
@@ -110,7 +111,7 @@ namespace MapEditing.MapEditing
                     Cursor.Position = new Point(screenResolution.Width / 2, screenResolution.Height / 2);
                     _lastCursorPosition = new Vector2(0.0f, 0.0f);
                 }
-                RDR2.UI.Hud.ShowCursorThisFrame();
+                Hud.ShowCursorThisFrame();
                 _isRotatingMapEditorCamera = false;
             }
         }

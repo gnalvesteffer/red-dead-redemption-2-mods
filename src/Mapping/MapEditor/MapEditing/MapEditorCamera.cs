@@ -9,6 +9,8 @@ namespace MapEditing.MapEditing
     {
         private const float CameraMovementSpeed = 0.1f;
         private const float CameraRotationSpeed = 360.0f;
+        private const float MinCameraPitch = -85.0f;
+        private const float MaxCameraPitch = 85.0f;
         private Camera _camera;
         private Vector3 _cameraDeltaRelativeTranslationThisTick;
         private Vector3 _cameraDeltaRelativeRotationThisTick;
@@ -84,7 +86,11 @@ namespace MapEditing.MapEditing
                 0.0f,
                 _cameraDeltaRelativeRotationThisTick.Z
             );
-            _camera.Rotation += localSpaceRelativeDeltaRotation * CameraRotationSpeed;
+            _camera.Rotation = new Vector3(
+                (_camera.Rotation.X + localSpaceRelativeDeltaRotation.X * CameraRotationSpeed).Clamp(MinCameraPitch, MaxCameraPitch),
+                _camera.Rotation.Y + localSpaceRelativeDeltaRotation.Y * CameraRotationSpeed,
+                _camera.Rotation.Z + localSpaceRelativeDeltaRotation.Z * CameraRotationSpeed
+            );
         }
 
         private void ResetInputs()
