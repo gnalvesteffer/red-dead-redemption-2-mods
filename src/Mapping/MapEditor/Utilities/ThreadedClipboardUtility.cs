@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace XorberaxMapEditor.Utilities
+namespace MapEditing.Utilities
 {
     internal class ThreadedClipboardUtility
     {

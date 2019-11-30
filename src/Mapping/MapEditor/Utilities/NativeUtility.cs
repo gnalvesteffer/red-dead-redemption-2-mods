@@ -3,7 +3,7 @@ using RDR2;
 using RDR2.Math;
 using RDR2.Native;
 
-namespace XorberaxMapEditor.Utilities
+namespace MapEditing.Utilities
 {
     internal static class NativeUtility
     {

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using MapEditing.MapPersistence;
+using MapEditing.Utilities;
 using RDR2;
 using RDR2.Math;
-using XorberaxMapEditor.MapPersistence;
-using XorberaxMapEditor.Utilities;
 using Cursor = System.Windows.Forms.Cursor;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 
-namespace XorberaxMapEditor.MapEditing
+namespace MapEditing.MapEditing
 {
     internal class MapEditor
     {

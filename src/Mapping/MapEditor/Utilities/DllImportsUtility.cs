@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace XorberaxMapEditor.Utilities
+namespace MapEditing.Utilities
 {
     internal static class DllImportsUtility
     {

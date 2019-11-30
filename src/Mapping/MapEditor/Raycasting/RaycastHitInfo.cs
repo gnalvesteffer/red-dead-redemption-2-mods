@@ -1,6 +1,6 @@
 using RDR2.Math;
 
-namespace XorberaxMapEditor.Raycasting
+namespace MapEditing.Raycasting
 {
     internal class RaycastHitInfo
     {

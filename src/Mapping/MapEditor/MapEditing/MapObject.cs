@@ -1,7 +1,7 @@
 using RDR2;
 using RDR2.Math;
 
-namespace XorberaxMapEditor.MapEditing
+namespace MapEditing.MapEditing
 {
     internal class MapObject
     {

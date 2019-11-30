@@ -1,4 +1,4 @@
-namespace XorberaxMapEditor.MapEditing
+namespace MapEditing.MapEditing
 {
     internal enum TransformationMode
     {

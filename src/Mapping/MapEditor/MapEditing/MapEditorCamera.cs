@@ -1,9 +1,9 @@
 using System;
+using MapEditing.Utilities;
 using RDR2;
 using RDR2.Math;
-using XorberaxMapEditor.Utilities;
 
-namespace XorberaxMapEditor.MapEditing
+namespace MapEditing.MapEditing
 {
     internal class MapEditorCamera
     {

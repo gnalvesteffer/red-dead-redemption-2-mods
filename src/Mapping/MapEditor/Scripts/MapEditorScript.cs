@@ -1,9 +1,9 @@
 using System;
+using MapEditing.MapEditing;
+using MapEditing.Utilities;
 using RDR2;
-using XorberaxMapEditor.MapEditing;
-using XorberaxMapEditor.Utilities;
 
-namespace XorberaxMapEditor.Scripts
+namespace MapEditing.Scripts
 {
     public class MapEditorScript : Script
     {

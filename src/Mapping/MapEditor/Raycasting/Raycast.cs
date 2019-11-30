@@ -1,8 +1,8 @@
+using MapEditing.Utilities;
 using RDR2;
 using RDR2.Math;
-using XorberaxMapEditor.Utilities;
 
-namespace XorberaxMapEditor.Raycasting
+namespace MapEditing.Raycasting
 {
     internal class Raycast
     {

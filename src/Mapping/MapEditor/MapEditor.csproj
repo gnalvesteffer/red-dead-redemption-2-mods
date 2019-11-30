@@ -7,7 +7,7 @@
         <ProjectGuid>{C037774C-A136-41FE-8277-83494492C009}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>XorberaxMapEditor</RootNamespace>
+        <RootNamespace>MapEditing</RootNamespace>
         <AssemblyName>MapEditing</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
