@@ -31,6 +31,7 @@ namespace MapEditing.MapEditing
         private TransformationAxis _translationAxis;
         private TransformationAxis _rotationAxis;
         private string _selectedObjectModelName;
+        private MapObject _selectedMapObject;
 
         public MapEditor()
         {
@@ -38,9 +39,11 @@ namespace MapEditing.MapEditing
             {
                 new Input("Toggle Map Editor", Keys.F1, false, 0, true, ToggleMapEditor),
                 new Input("Spawn Object", Keys.F2, false, 0, false, SpawnSelectedObjectHash),
-                new Input("Delete Object", Keys.Delete, false, 0, false, RemoveLastSpawnedObject),
+                new Input("Delete Object", Keys.Delete, false, 0, false, RemoveSelectedObject),
                 new Input("Load Map", Keys.F3, false, 0, false, LoadMap),
                 new Input("Save Map", Keys.F4, false, 0, false, SaveMap),
+                new Input("Select Previous Object", Keys.OemOpenBrackets, false, 0, false, () => ChangeSelectedObject(-1)),
+                new Input("Select Next Object", Keys.OemCloseBrackets, false, 0, false, () => ChangeSelectedObject(1)),
                 new Input("Change Transformation Mode", Keys.Oemcomma, false, 0, false, ChangeTransformationMode),
                 new Input("Change Transformation Axis", Keys.OemPeriod, false, 0, false, ChangeTransformationAxis),
                 new Input("Negative Transformation", Keys.Left, true, 0, false, () => ApplyTransformation(-1.0f)),
@@ -140,13 +143,7 @@ namespace MapEditing.MapEditing
 
         private void DrawSelectedObjectIndicator()
         {
-            if (!_isInMapEditorMode)
-            {
-                return;
-            }
-
-            var selectedObject = _spawnedObjects.LastOrDefault();
-            if (selectedObject == null)
+            if (!_isInMapEditorMode || _selectedMapObject == null)
             {
                 return;
             }
@@ -154,7 +151,7 @@ namespace MapEditing.MapEditing
             new TextElement
             {
                 Message = "*",
-                NormalizedScreenPosition = NativeUtility.WorldToScreen(selectedObject.Position),
+                NormalizedScreenPosition = NativeUtility.WorldToScreen(_selectedMapObject.Position),
             }.Draw();
         }
 
@@ -256,26 +253,24 @@ namespace MapEditing.MapEditing
 
         private void TranslateLastSpawnedObject(Vector3 deltaTranslation)
         {
-            var lastSpawnedObject = _spawnedObjects.LastOrDefault();
-            if (lastSpawnedObject == null)
+            if (_selectedMapObject == null)
             {
                 return;
             }
-            var newPosition = lastSpawnedObject.Position + deltaTranslation;
-            NativeUtility.SetEntityPosition(lastSpawnedObject.Entity, newPosition);
-            lastSpawnedObject.Position = newPosition;
+            var newPosition = _selectedMapObject.Position + deltaTranslation;
+            NativeUtility.SetEntityPosition(_selectedMapObject.Entity, newPosition);
+            _selectedMapObject.Position = newPosition;
         }
 
         private void RotateLastSpawnedObject(Vector3 deltaRotation)
         {
-            var lastSpawnedObject = _spawnedObjects.LastOrDefault();
-            if (lastSpawnedObject == null)
+            if (_selectedMapObject == null)
             {
                 return;
             }
-            var newRotation = lastSpawnedObject.Rotation + deltaRotation;
-            NativeUtility.SetEntityRotation(lastSpawnedObject.Entity, newRotation);
-            lastSpawnedObject.Rotation = newRotation;
+            var newRotation = _selectedMapObject.Rotation + deltaRotation;
+            NativeUtility.SetEntityRotation(_selectedMapObject.Entity, newRotation);
+            _selectedMapObject.Rotation = newRotation;
         }
 
         private MapObject SpawnObject(string modelName, Vector3 position, Vector3 rotation)
@@ -289,6 +284,7 @@ namespace MapEditing.MapEditing
                 return null;
             }
             _spawnedObjects.Add(spawnedObject);
+            _selectedMapObject = spawnedObject;
             NativeUtility.UserFriendlyPrint($"Created \"{modelName}\"");
             return spawnedObject;
         }
@@ -301,16 +297,26 @@ namespace MapEditing.MapEditing
             SpawnObject(_selectedObjectModelName, spawnPosition, spawnRotation);
         }
 
-        private void RemoveLastSpawnedObject()
+        private void RemoveSelectedObject()
         {
-            var mapObject = _spawnedObjects.LastOrDefault();
-            if (mapObject == null)
+            if (_selectedMapObject == null)
             {
                 return;
             }
-            mapObject.Entity.Delete();
-            _spawnedObjects.Remove(mapObject);
-            NativeUtility.UserFriendlyPrint($"Removed \"{mapObject.ModelName}\"");
+            var selectedMapObjectIndex = _spawnedObjects.IndexOf(_selectedMapObject);
+            _selectedMapObject.Entity.Delete();
+            _spawnedObjects.Remove(_selectedMapObject);
+            NativeUtility.UserFriendlyPrint($"Removed \"{_selectedMapObject.ModelName}\"");
+            _selectedMapObject = _spawnedObjects.Count > 0 ? _spawnedObjects[selectedMapObjectIndex - 1] : null;
+        }
+
+        private void ChangeSelectedObject(int deltaIndex)
+        {
+            var selectedMapObjectIndex = _spawnedObjects.IndexOf(_selectedMapObject);
+            var totalSpawnedObjects = _spawnedObjects.Count;
+            _selectedMapObject = totalSpawnedObjects > 0
+                ? _spawnedObjects[(selectedMapObjectIndex + deltaIndex).Clamp(0, totalSpawnedObjects - 1)]
+                : null;
         }
 
         private void LoadMap()
