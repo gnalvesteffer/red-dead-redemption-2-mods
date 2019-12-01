@@ -307,7 +307,10 @@ namespace MapEditing.MapEditing
             _selectedMapObject.Entity.Delete();
             _spawnedObjects.Remove(_selectedMapObject);
             NativeUtility.UserFriendlyPrint($"Removed \"{_selectedMapObject.ModelName}\"");
-            _selectedMapObject = _spawnedObjects.Count > 0 ? _spawnedObjects[selectedMapObjectIndex - 1] : null;
+            var totalSpawnedObjects = _spawnedObjects.Count;
+            _selectedMapObject = totalSpawnedObjects > 0
+                ? _spawnedObjects[(selectedMapObjectIndex - 1).Clamp(0, totalSpawnedObjects - 1)]
+                : null;
         }
 
         private void ChangeSelectedObject(int deltaIndex)
