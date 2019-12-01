@@ -9,7 +9,7 @@ using RDR2;
 using RDR2.Math;
 using RDR2.UI;
 using Control = System.Windows.Forms.Control;
-using Screen = System.Windows.Forms.Screen;
+using TextElement = MapEditing.UserInterface.TextElement;
 
 namespace MapEditing.MapEditing
 {
@@ -23,14 +23,14 @@ namespace MapEditing.MapEditing
         private readonly Dictionary<Keys, Input> _keyboardInputs;
         private readonly HashSet<Keys> _keysToProcess = new HashSet<Keys>();
         private readonly HashSet<Keys> _handledNonRepeatableKeys = new HashSet<Keys>();
+        private readonly MapEditorCamera _mapEditorCamera = new MapEditorCamera();
+        private bool _isRotatingMapEditorCamera;
         private bool _isInMapEditorMode;
         private long _tick;
         private TransformationMode _transformationMode;
         private TransformationAxis _translationAxis;
         private TransformationAxis _rotationAxis;
-        private MapEditorCamera _mapEditorCamera = new MapEditorCamera();
-        private bool _isRotatingMapEditorCamera;
-        private string _selectedObjectHash = "p_amb_tent01x";
+        private string _selectedObjectModelName;
 
         public MapEditor()
         {
@@ -60,6 +60,7 @@ namespace MapEditing.MapEditing
         {
             HandleInputs();
             _mapEditorCamera.OnTick();
+            DrawSelectedObjectIndicator();
             ++_tick;
         }
 
@@ -86,26 +87,26 @@ namespace MapEditing.MapEditing
             {
                 return;
             }
-            var screenResolution = Screen.PrimaryScreen.Bounds; // TODO: make reliable
+            var screenResolution = ScreenUtility.GetScreenResolution();
             if (Control.MouseButtons == MouseButtons.Right)
             {
                 if (!_isRotatingMapEditorCamera)
                 {
-                    Cursor.Position = new Point(screenResolution.Width / 2, screenResolution.Height / 2);
+                    Cursor.Position = new Point((int)screenResolution.X / 2, (int)screenResolution.Y / 2);
                 }
                 var deltaCursorPosition = new Vector2(
-                    (float)Cursor.Position.X / screenResolution.Width - 0.5f,
-                    (float)Cursor.Position.Y / screenResolution.Height - 0.5f
+                    Cursor.Position.X / screenResolution.X - 0.5f,
+                    Cursor.Position.Y / screenResolution.Y - 0.5f
                 );
                 _mapEditorCamera.Rotate(new Vector3(-deltaCursorPosition.Y, 0, -deltaCursorPosition.X));
-                Cursor.Position = new Point(screenResolution.Width / 2, screenResolution.Height / 2);
+                Cursor.Position = new Point((int)screenResolution.X / 2, (int)screenResolution.Y / 2);
                 _isRotatingMapEditorCamera = true;
             }
             else
             {
                 if (_isRotatingMapEditorCamera)
                 {
-                    Cursor.Position = new Point(screenResolution.Width / 2, screenResolution.Height / 2);
+                    Cursor.Position = new Point((int)screenResolution.X / 2, (int)screenResolution.Y / 2);
                 }
                 Hud.ShowCursorThisFrame();
                 _isRotatingMapEditorCamera = false;
@@ -135,6 +136,26 @@ namespace MapEditing.MapEditing
                     input.Handler();
                 }
             }
+        }
+
+        private void DrawSelectedObjectIndicator()
+        {
+            if (!_isInMapEditorMode)
+            {
+                return;
+            }
+
+            var selectedObject = _spawnedObjects.LastOrDefault();
+            if (selectedObject == null)
+            {
+                return;
+            }
+
+            new TextElement
+            {
+                Message = "*",
+                NormalizedScreenPosition = NativeUtility.WorldToScreen(selectedObject.Position),
+            }.Draw();
         }
 
         private void ApplyTransformation(float amount)
@@ -274,10 +295,10 @@ namespace MapEditing.MapEditing
 
         private void SpawnSelectedObjectHash()
         {
-            _selectedObjectHash = _threadedClipboardUtility.GetText();
+            _selectedObjectModelName = _threadedClipboardUtility.GetText();
             var spawnPosition = _mapEditorCamera.Position;
             var spawnRotation = new Vector3(0, 0, _mapEditorCamera.Rotation.Z);
-            SpawnObject(_selectedObjectHash, spawnPosition, spawnRotation);
+            SpawnObject(_selectedObjectModelName, spawnPosition, spawnRotation);
         }
 
         private void RemoveLastSpawnedObject()

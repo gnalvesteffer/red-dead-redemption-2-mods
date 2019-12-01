@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using RDR2;
 using RDR2.Math;
 using RDR2.Native;
@@ -12,7 +13,7 @@ namespace MapEditing.Utilities
 
         public static void DebugPrint(object text)
         {
-            var createdString = Function.Call<string>(Hash.CREATE_STRING, 10, "LITERAL_STRING", text.ToString());
+            var createdString = CreateString(text.ToString());
             Function.Call(Hash._DRAW_TEXT, createdString, 5, 5);
             Console.WriteLine(text);
         }
@@ -27,6 +28,11 @@ namespace MapEditing.Utilities
             Function.Call(Hash._LOG_SET_CACHED_OBJECTIVE, createdString);
             Function.Call(Hash._LOG_PRINT_CACHED_OBJECTIVE);
             Function.Call(Hash._LOG_CLEAR_CACHED_OBJECTIVE);
+        }
+
+        public static string CreateString(string text)
+        {
+            return Function.Call<string>(Hash.CREATE_STRING, 10, "LITERAL_STRING", text);
         }
 
         public static int GetHashKey(string hashValue)
@@ -143,6 +149,58 @@ namespace MapEditing.Utilities
                 false,
                 new Vector3(),
                 new Vector3()
+            );
+        }
+
+        public static void DrawRectangle(
+            float x,
+            float y,
+            float width,
+            float height,
+            int red,
+            int green,
+            int blue,
+            int alpha
+        )
+        {
+            Function.Call(Hash.DRAW_RECT, x, y, width, height, red, green, blue, alpha);
+        }
+
+        public static void DrawText(
+            string text,
+            Vector2 normalizedScreenPosition,
+            float scale,
+            Color color,
+            bool shouldDrawShadow = false
+        )
+        {
+            if (shouldDrawShadow)
+            {
+                Function.Call(Hash.SET_TEXT_DROPSHADOW, 2, 0, 0, 0, 255);
+            }
+
+            var createdString = CreateString(text);
+            Function.Call(Hash.SET_TEXT_SCALE, scale, scale);
+            Function.Call(Hash._SET_TEXT_COLOR, color.R, color.G, color.B, color.A);
+            Function.Call(Hash._DRAW_TEXT, createdString, normalizedScreenPosition.X, normalizedScreenPosition.Y);
+        }
+
+        /// <returns>Normalized screen position</returns>
+        public static Vector2 WorldToScreen(Vector3 worldPosition)
+        {
+            var screenPositionXOutputArgument = new OutputArgument();
+            var screenPositionYOutputArgument = new OutputArgument();
+            Function.Call(
+                Hash.GET_SCREEN_COORD_FROM_WORLD_COORD,
+                worldPosition.X,
+                worldPosition.Y,
+                worldPosition.Z,
+                screenPositionXOutputArgument,
+                screenPositionYOutputArgument
+            );
+            return new Vector2(
+                screenPositionXOutputArgument.GetResult<float>(),
+                screenPositionYOutputArgument.GetResult<float>()
             );
         }
     }
