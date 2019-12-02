@@ -3,11 +3,13 @@ using System.Drawing;
 using RDR2;
 using RDR2.Math;
 using RDR2.Native;
+using Font = RDR2.UI.Font;
 
 namespace MapEditing.Utilities
 {
     internal static class NativeUtility
     {
+        public const int GameFullFontSizeInPixels = 45;
         public const float DegreesToRadians = (float)(Math.PI * 2 / 360.0f);
         public const float RadiansToDegrees = (float)(360 / (Math.PI * 2));
 
@@ -153,36 +155,22 @@ namespace MapEditing.Utilities
         }
 
         public static void DrawRectangle(
-            float x,
-            float y,
-            float width,
-            float height,
-            int red,
-            int green,
-            int blue,
-            int alpha
+            Vector2 normalizedOriginScreenPosition,
+            Vector2 sizeRelativeToScreen,
+            Color color
         )
         {
-            Function.Call(Hash.DRAW_RECT, x, y, width, height, red, green, blue, alpha);
-        }
-
-        public static void DrawText(
-            string text,
-            Vector2 normalizedScreenPosition,
-            float scale,
-            Color color,
-            bool shouldDrawShadow = false
-        )
-        {
-            if (shouldDrawShadow)
-            {
-                Function.Call(Hash.SET_TEXT_DROPSHADOW, 2, 0, 0, 0, 255);
-            }
-
-            var createdString = CreateString(text);
-            Function.Call(Hash.SET_TEXT_SCALE, scale, scale);
-            Function.Call(Hash._SET_TEXT_COLOR, color.R, color.G, color.B, color.A);
-            Function.Call(Hash._DRAW_TEXT, createdString, normalizedScreenPosition.X, normalizedScreenPosition.Y);
+            Function.Call(
+                Hash.DRAW_RECT,
+                normalizedOriginScreenPosition.X,
+                normalizedOriginScreenPosition.Y,
+                sizeRelativeToScreen.X,
+                sizeRelativeToScreen.Y,
+                color.R,
+                color.G,
+                color.B,
+                color.A
+            );
         }
 
         /// <returns>Normalized screen position</returns>
@@ -202,6 +190,35 @@ namespace MapEditing.Utilities
                 screenPositionXOutputArgument.GetResult<float>(),
                 screenPositionYOutputArgument.GetResult<float>()
             );
+        }
+
+        public static void DrawText(
+            string text,
+            int fontSizeInPixels,
+            Color color,
+            Vector2 normalizedScreenPosition,
+            bool isCentered = true,
+            bool shouldDrawShadow = false
+        )
+        {
+            if (shouldDrawShadow)
+            {
+                Function.Call(Hash.SET_TEXT_DROPSHADOW, 2, 0, 0, 0, 255);
+            }
+
+            var createdString = CreateString(text);
+            Function.Call(Hash.SET_TEXT_CENTRE, isCentered);
+            Function.Call(Hash.SET_TEXT_SCALE, 1.0f, GetTextScale(text, fontSizeInPixels).Y);
+            Function.Call(Hash._SET_TEXT_COLOR, color.R, color.G, color.B, color.A);
+            Function.Call(Hash._DRAW_TEXT, createdString, normalizedScreenPosition.X, normalizedScreenPosition.Y);
+        }
+
+        public static Vector2 GetTextScale(string text, int fontSizeInPixels)
+        {
+            var normalizedFontSize = (float)fontSizeInPixels / GameFullFontSizeInPixels;
+            var normalizedCharacterWidth = normalizedFontSize * ScreenUtility.GetAspectRatio();
+            var textWidth = text.Trim().Length * normalizedCharacterWidth;
+            return new Vector2(textWidth, normalizedFontSize);
         }
     }
 }

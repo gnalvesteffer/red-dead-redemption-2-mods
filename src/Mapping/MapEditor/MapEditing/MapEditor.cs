@@ -4,12 +4,14 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using MapEditing.MapPersistence;
+using MapEditing.UserInterface.MenuFramework;
 using MapEditing.Utilities;
 using RDR2;
 using RDR2.Math;
 using RDR2.UI;
 using Control = System.Windows.Forms.Control;
-using TextElement = MapEditing.UserInterface.TextElement;
+using Menu = MapEditing.UserInterface.MenuFramework.Menu;
+using TextElement = MapEditing.UserInterface.Basic.TextElement;
 
 namespace MapEditing.MapEditing
 {
@@ -23,6 +25,7 @@ namespace MapEditing.MapEditing
         private readonly Dictionary<Keys, Input> _keyboardInputs;
         private readonly HashSet<Keys> _keysToProcess = new HashSet<Keys>();
         private readonly HashSet<Keys> _handledNonRepeatableKeys = new HashSet<Keys>();
+        private readonly Menu _mapEditorMenu;
         private readonly MapEditorCamera _mapEditorCamera = new MapEditorCamera();
         private bool _isRotatingMapEditorCamera;
         private bool _isInMapEditorMode;
@@ -35,17 +38,51 @@ namespace MapEditing.MapEditing
 
         public MapEditor()
         {
+            _mapEditorMenu = new Menu(
+                new MenuConfiguration
+                {
+                    Title = "Map Editor",
+                    TitleBackgroundColor = Color.Black,
+                    TitleTextColor = Color.White,
+                    MenuItems = new[]
+                    {
+                        new MenuItemConfiguration
+                        {
+                            GetDisplayText = () => "Spawn Object",
+                            FontSizeInPixels = 12,
+                            UnfocusedBackgroundColor = Color.Black,
+                            FocusedBackgroundColor = Color.Black,
+                            UnfocusedTextColor = Color.White,
+                            FocusedTextColor = Color.Red,
+                            OnSelect = SpawnSelectedObjectHash,
+                        },
+                        new MenuItemConfiguration
+                        {
+                            GetDisplayText = () => $"Delete Object",
+                            FontSizeInPixels = 12,
+                            UnfocusedBackgroundColor = Color.Black,
+                            FocusedBackgroundColor = Color.Black,
+                            UnfocusedTextColor = Color.White,
+                            FocusedTextColor = Color.Red,
+                            OnSelect = DeleteSelectedObject,
+                        },
+                    },
+                }
+            );
             _keyboardInputs = new[]
             {
                 new Input("Toggle Map Editor", Keys.F1, false, 0, true, ToggleMapEditor),
                 new Input("Spawn Object", Keys.F2, false, 0, false, SpawnSelectedObjectHash),
-                new Input("Delete Object", Keys.Delete, false, 0, false, RemoveSelectedObject),
+                new Input("Delete Object", Keys.Delete, false, 0, false, DeleteSelectedObject),
                 new Input("Load Map", Keys.F3, false, 0, false, LoadMap),
                 new Input("Save Map", Keys.F4, false, 0, false, SaveMap),
                 new Input("Select Previous Object", Keys.OemOpenBrackets, false, 0, false, () => ChangeSelectedObject(-1)),
                 new Input("Select Next Object", Keys.OemCloseBrackets, false, 0, false, () => ChangeSelectedObject(1)),
                 new Input("Change Transformation Mode", Keys.Oemcomma, false, 0, false, ChangeTransformationMode),
                 new Input("Change Transformation Axis", Keys.OemPeriod, false, 0, false, ChangeTransformationAxis),
+                new Input("Menu Up", Keys.Up, false, 0, false, () => _mapEditorMenu.NavigateMenu(MenuNavigationDirection.Previous)),
+                new Input("Menu Down", Keys.Down, false, 0, false, () => _mapEditorMenu.NavigateMenu(MenuNavigationDirection.Next)),
+                new Input("Menu Select", Keys.Enter, false, 0, false, () => _mapEditorMenu.SelectFocusedMenuItem()),
                 new Input("Negative Transformation", Keys.Left, true, 0, false, () => ApplyTransformation(-1.0f)),
                 new Input("Positive Transformation", Keys.Right, true, 0, false, () => ApplyTransformation(1.0f)),
                 new Input("Move Camera Forward", Keys.W, true, 0, false, () => _mapEditorCamera.Translate(Vector3.RelativeFront)),
@@ -64,6 +101,7 @@ namespace MapEditing.MapEditing
             HandleInputs();
             _mapEditorCamera.OnTick();
             DrawSelectedObjectIndicator();
+            _mapEditorMenu.Draw();
             ++_tick;
         }
 
@@ -150,8 +188,11 @@ namespace MapEditing.MapEditing
 
             new TextElement
             {
-                Message = "*",
+                Message = _selectedMapObject.ModelName,
                 NormalizedScreenPosition = NativeUtility.WorldToScreen(_selectedMapObject.Position),
+                FontSizeInPixels = 16,
+                Color = Color.White,
+                IsCentered = true,
             }.Draw();
         }
 
@@ -240,6 +281,7 @@ namespace MapEditing.MapEditing
         private void OnMapEditorModeEnter()
         {
             _mapEditorCamera.Enter();
+            _mapEditorMenu.IsVisible = true;
             Game.Player.CanControlCharacter = false;
             NativeUtility.UserFriendlyPrint("Entered Map Editor");
         }
@@ -247,6 +289,7 @@ namespace MapEditing.MapEditing
         private void OnMapEditorModeExit()
         {
             _mapEditorCamera.Exit();
+            _mapEditorMenu.IsVisible = false;
             Game.Player.CanControlCharacter = true;
             NativeUtility.UserFriendlyPrint("Exited Map Editor");
         }
@@ -297,7 +340,7 @@ namespace MapEditing.MapEditing
             SpawnObject(_selectedObjectModelName, spawnPosition, spawnRotation);
         }
 
-        private void RemoveSelectedObject()
+        private void DeleteSelectedObject()
         {
             if (_selectedMapObject == null)
             {

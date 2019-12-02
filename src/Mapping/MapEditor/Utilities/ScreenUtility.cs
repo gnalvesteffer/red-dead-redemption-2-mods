@@ -19,5 +19,20 @@ namespace MapEditing.Utilities
                 normalizedPosition.Y * screenResolution.Y
             );
         }
+
+        public static Vector2 GetNormalizedPosition(Vector2 absolutePosition)
+        {
+            var screenResolution = GetScreenResolution();
+            return new Vector2(
+                absolutePosition.X / screenResolution.X,
+                absolutePosition.Y / screenResolution.Y
+            );
+        }
+
+        public static float GetAspectRatio()
+        {
+            var resolution = GetScreenResolution();
+            return resolution.X / resolution.Y;
+        }
     }
 }
