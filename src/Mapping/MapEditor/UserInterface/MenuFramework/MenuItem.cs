@@ -106,7 +106,7 @@ namespace MapEditing.UserInterface.MenuFramework
             _rectangleElement.NormalizedScreenPosition = NormalizedScreenPosition;
             _rectangleElement.AbsoluteSize = GetMenuItemAbsoluteSize();
             _rectangleElement.Color = IsFocused ? _focusedBackgroundColor : _unfocusedBackgroundColor;
-            //_rectangleElement.Draw();
+            _rectangleElement.Draw();
             _textElement.NormalizedScreenPosition = NormalizedScreenPosition;
             _textElement.Color = IsFocused ? _focusedTextColor : _unfocusedTextColor;
             _textElement.Message = _getDisplayText();

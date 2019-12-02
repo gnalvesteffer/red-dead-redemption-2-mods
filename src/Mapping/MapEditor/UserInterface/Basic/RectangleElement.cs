@@ -23,9 +23,17 @@ namespace MapEditing.UserInterface.Basic
 
         public override void Draw()
         {
-            var sizeRelativeToScreen = AbsoluteSize;
-            var normalizedPosition = NormalizedScreenPosition;
-            NativeUtility.DrawRectangle(normalizedPosition, sizeRelativeToScreen, Color);
+            var screenResolution = ScreenUtility.GetScreenResolution();
+            var normalizedSize = new Vector2(
+                AbsoluteSize.X / screenResolution.X,
+                AbsoluteSize.Y / screenResolution.Y
+            );
+            var normalizedPositionOffset = new Vector2(
+                normalizedSize.X / 2,
+                normalizedSize.Y
+            );
+            var normalizedPosition = NormalizedScreenPosition + normalizedPositionOffset;
+            NativeUtility.DrawRectangle(normalizedPosition, normalizedSize, Color);
         }
     }
 }
