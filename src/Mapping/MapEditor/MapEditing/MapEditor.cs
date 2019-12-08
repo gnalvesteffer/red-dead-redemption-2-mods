@@ -54,7 +54,7 @@ namespace MapEditing.MapEditing
                             FocusedBackgroundColor = Color.DarkRed,
                             UnfocusedTextColor = Color.DarkGray,
                             FocusedTextColor = Color.White,
-                            OnSelect = SpawnSelectedObjectHash,
+                            OnSelect = SpawnSelectedObjectModelName,
                         },
                         new MenuItemConfiguration
                         {
@@ -72,7 +72,7 @@ namespace MapEditing.MapEditing
             _keyboardInputs = new[]
             {
                 new Input("Toggle Map Editor", Keys.F1, false, 0, true, ToggleMapEditor),
-                new Input("Spawn Object", Keys.F2, false, 0, false, SpawnSelectedObjectHash),
+                new Input("Spawn Object", Keys.F2, false, 0, false, SpawnSelectedObjectModelName),
                 new Input("Delete Object", Keys.Delete, false, 0, false, DeleteSelectedObject),
                 new Input("Load Map", Keys.F3, false, 0, false, LoadMap),
                 new Input("Save Map", Keys.F4, false, 0, false, SaveMap),
@@ -332,11 +332,29 @@ namespace MapEditing.MapEditing
             return spawnedObject;
         }
 
-        private void SpawnSelectedObjectHash()
+        private void SpawnSelectedObjectModelName()
         {
             _selectedObjectModelName = _threadedClipboardUtility.GetText();
-            var spawnPosition = _mapEditorCamera.Position;
-            var spawnRotation = new Vector3(0, 0, _mapEditorCamera.Rotation.Z);
+            var cameraPosition = _mapEditorCamera.Position;
+            var adjustedCameraRotation = (float)Math.PI / 180f * _mapEditorCamera.Rotation;
+            var raycastResult = World.Raycast(
+                cameraPosition,
+                cameraPosition +
+                Vector3.Normalize(
+                    new Vector3(
+                        (float)-Math.Sin(adjustedCameraRotation.Z) * (float)Math.Abs(Math.Cos(adjustedCameraRotation.X)),
+                        (float)Math.Cos(adjustedCameraRotation.Z) * (float)Math.Abs(Math.Cos(adjustedCameraRotation.X)),
+                        (float)Math.Sin(adjustedCameraRotation.X)
+                    )
+                ) * 100.0f,
+                IntersectOptions.Everything
+            );
+            var spawnPosition = raycastResult.DitHit
+                ? raycastResult.HitPosition
+                : _mapEditorCamera.Position;
+            var spawnRotation = raycastResult.DitHit
+                ? raycastResult.SurfaceNormal
+                : new Vector3(0, 0, _mapEditorCamera.Rotation.Z);
             SpawnObject(_selectedObjectModelName, spawnPosition, spawnRotation);
         }
 
