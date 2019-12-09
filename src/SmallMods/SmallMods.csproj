@@ -33,7 +33,7 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="ScriptHookRDRNetAPI, Version=1.0.4.7, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="ScriptHookRDRNetAPI, Version=1.0.5.1, Culture=neutral, PublicKeyToken=null">
           <HintPath>..\..\ScriptHookRDRNetAPI.dll</HintPath>
         </Reference>
         <Reference Include="System" />

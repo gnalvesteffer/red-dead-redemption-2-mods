@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using MapEditing.MapPersistence;
@@ -318,7 +319,23 @@ namespace MapEditing.MapEditing
 
         private MapObject SpawnObject(string modelName, Vector3 position, Vector3 rotation)
         {
-            var entity = NativeUtility.CreateObject(modelName, position);
+            Entity entity;
+            if (modelName.StartsWith("0x"))
+            {
+                if (int.TryParse(modelName.Substring(2), NumberStyles.HexNumber, new NumberFormatInfo(), out var modelHash))
+                {
+                    entity = NativeUtility.CreateObject(modelHash, position);
+                }
+                else
+                {
+                    NativeUtility.UserFriendlyPrint($"Failed to spawn \"{modelName}\"");
+                    return null;
+                }
+            }
+            else
+            {
+                entity = NativeUtility.CreateObject(modelName, position);
+            }
             NativeUtility.SetEntityRotation(entity, rotation);
             var spawnedObject = new MapObject(modelName, position, rotation, entity);
             if (entity == null)

@@ -37,21 +37,26 @@ namespace MapEditing.Utilities
             return Function.Call<string>(Hash.CREATE_STRING, 10, "LITERAL_STRING", text);
         }
 
-        public static int GetHashKey(string hashValue)
+        public static int GetHashKeyFromModelName(string modelName)
         {
-            return Function.Call<int>(Hash.GET_HASH_KEY, hashValue);
+            return Function.Call<int>(Hash.GET_HASH_KEY, modelName);
         }
 
-        public static Ped CreatePed(string hashValue, Vector3 position, bool isVisible = true)
+        public static Ped CreatePed(string modelName, Vector3 position, bool isVisible = true)
         {
-            var ped = Function.Call<Ped>(Hash.CREATE_PED, GetHashKey(hashValue), position.X, position.Y, position.Z, 0, false, false, 0);
+            var ped = Function.Call<Ped>(Hash.CREATE_PED, GetHashKeyFromModelName(modelName), position.X, position.Y, position.Z, 0, false, false, 0);
             Function.Call((Hash)0x283978A15512B2FE, ped, isVisible);
             return ped;
         }
 
-        public static Entity CreateObject(string hashValue, Vector3 position)
+        public static Entity CreateObject(int hash, Vector3 position)
         {
-            return Function.Call<Entity>(Hash.CREATE_OBJECT_NO_OFFSET, GetHashKey(hashValue), position.X, position.Y, position.Z, false, false, false);
+            return Function.Call<Entity>(Hash.CREATE_OBJECT_NO_OFFSET, hash, position.X, position.Y, position.Z, false, false, false);
+        }
+
+        public static Entity CreateObject(string modelName, Vector3 position)
+        {
+            return Function.Call<Entity>(Hash.CREATE_OBJECT_NO_OFFSET, GetHashKeyFromModelName(modelName), position.X, position.Y, position.Z, false, false, false);
         }
 
         public static Vector3 GetEntityRotation(Entity entity)
