@@ -369,9 +369,7 @@ namespace MapEditing.MapEditing
             var spawnPosition = raycastResult.DitHit
                 ? raycastResult.HitPosition
                 : _mapEditorCamera.Position;
-            var spawnRotation = raycastResult.DitHit
-                ? raycastResult.SurfaceNormal
-                : new Vector3(0, 0, _mapEditorCamera.Rotation.Z);
+            var spawnRotation = new Vector3(0, 0, _mapEditorCamera.Rotation.Z);
             SpawnObject(_selectedObjectModelName, spawnPosition, spawnRotation);
         }
 
